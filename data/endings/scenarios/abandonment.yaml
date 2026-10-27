@@ -1,0 +1,5 @@
+endingId: abandonment
+status: development-placeholder
+dialogue:
+  - speaker: "ナレーション"
+    text: "途中離脱エンディング用の仮シナリオです。"

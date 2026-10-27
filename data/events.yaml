@@ -1,0 +1,62 @@
+version: 1
+status: development-sample
+events:
+  - id: sample-arrival
+    stageId: stage-01
+    type: story
+    priority: 100
+    probability: 1
+    repeatPolicy:
+      mode: once
+    condition:
+      all:
+        - parameter: affection
+          operator: gte
+          value: 0
+      any:
+        - flag: sample_event_unlocked
+          operator: eq
+          value: true
+    dialogue:
+      - speaker: "天依わな"
+        text: "これはデータ形式確認用の仮イベントです。"
+    choices:
+      - id: continue
+        text: "確認する"
+        effects:
+          parameterChanges:
+            affection: 1
+          flagChanges:
+            sample_event_seen: true
+        nextEventId: sample-follow-up
+    relatedEndingIds:
+      - completion
+    deferPolicy:
+      enabled: true
+      retryCondition:
+        all:
+          - flag: sample_event_unlocked
+            operator: eq
+            value: true
+
+  - id: sample-follow-up
+    stageId: stage-01
+    type: special
+    priority: 50
+    probability: 0.5
+    repeatPolicy:
+      mode: cooldown
+      cooldownStages: 2
+    condition:
+      any:
+        - flag: sample_event_seen
+          operator: eq
+          value: true
+    dialogue:
+      - speaker: "ナレーション"
+        text: "分岐先IDの参照を検証するための仮イベントです。"
+    choices: []
+    relatedEndingIds:
+      - abandonment
+    deferPolicy:
+      enabled: false

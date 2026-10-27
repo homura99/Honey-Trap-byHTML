@@ -1,0 +1,9 @@
+version: 1
+status: development-sample
+endings:
+  - id: abandonment
+    title: "途中離脱（仮）"
+    scenario: scenarios/abandonment.yaml
+  - id: completion
+    title: "完走（仮）"
+    scenario: scenarios/completion.yaml
