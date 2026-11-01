@@ -142,9 +142,13 @@ function validateDialogue(dialogue, path, errors) {
   }
 
   dialogue.forEach((line, index) => {
-    if (!isRecord(line) || typeof line.speaker !== "string" || !line.speaker.trim() ||
+    if (!isRecord(line) ||
+      (line.speaker !== undefined && line.speaker !== null && typeof line.speaker !== "string") ||
+      (line.displayMode !== undefined && !["bottom", "fullscreen"].includes(line.displayMode)) ||
       typeof line.text !== "string" || !line.text.trim()) {
-      errors.push(`${path}[${index}]: speaker and text are required.`);
+      errors.push(
+        `${path}[${index}]: text is required; speaker must be a string when provided and displayMode must be "bottom" or "fullscreen".`,
+      );
     }
   });
 }

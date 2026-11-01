@@ -1,0 +1,117 @@
+.load,
+.load * {
+  box-sizing: border-box;
+}
+.load {
+  background: #ffffff;
+  height: 1080px;
+  position: relative;
+  overflow: hidden;
+}
+.now-loading {
+  color: #ff9797;
+  text-align: left;
+  font-family: "InriaSerif-Regular", sans-serif;
+  font-size: 64px;
+  font-weight: 400;
+  position: absolute;
+  left: calc(50% - 187px);
+  top: 664px;
+  width: 376px;
+  height: 82px;
+}
+.div {
+  color: #ff9797;
+  text-align: left;
+  font-family: "InriaSerif-Regular", sans-serif;
+  font-size: 64px;
+  font-weight: 400;
+  position: absolute;
+  left: 1148px;
+  top: 664px;
+  width: 48px;
+  height: 82px;
+}
+._394-20260801215240-1 {
+  width: 122px;
+  height: 122px;
+  position: absolute;
+  left: 1556px;
+  top: 871px;
+  object-fit: cover;
+  aspect-ratio: 1;
+}
+.frame-2 {
+  background: #e1e1e1;
+  width: 1719px;
+  height: 17px;
+  position: absolute;
+  left: 50%;
+  translate: -50%;
+  top: 978px;
+  overflow: hidden;
+}
+.frame-1 {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 192, 192, 1) 0%,
+    rgba(255, 114, 114, 1) 100%
+  );
+  width: 1577px;
+  height: 17px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  overflow: hidden;
+}
+.frame-3 {
+  width: 737px;
+  height: 423px;
+  position: absolute;
+  left: 592px;
+  top: 210px;
+}
+._391-20260801205300-1 {
+  width: 737px;
+  height: 423px;
+  position: absolute;
+  left: 50%;
+  translate: -50%;
+  top: 0px;
+  object-fit: cover;
+  aspect-ratio: 737/423;
+}
+.frame-8 {
+  width: 1861px;
+  height: 273px;
+  position: absolute;
+  left: 30px;
+  top: 30px;
+}
+._395-20260801231115-1 {
+  width: 273px;
+  height: 273px;
+  position: absolute;
+  left: 0px;
+  top: 273px;
+  transform-origin: 0 0;
+  transform: rotate(-90deg) scale(1, 1);
+  object-fit: cover;
+  aspect-ratio: 1;
+}
+._395-20260801231115-2 {
+  width: 273px;
+  height: 273px;
+  position: absolute;
+  left: 1588px;
+  top: 0px;
+  object-fit: cover;
+  aspect-ratio: 1;
+}
+/* Figma Styles of your File */
+:root {
+  /* Colors */
+  /* Fonts */
+  /* Effects */
+}
+/* Figma Color Variables of your File */

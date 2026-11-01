@@ -43,6 +43,35 @@ test("reports YAML syntax errors as fatal validation errors", async () => {
   assert.ok(result.errors.some((error) => error.includes("data/events.yaml")));
 });
 
+test("allows dialogue and narration lines without a speaker name", async () => {
+  const sources = await loadSources();
+  sources["data/events.yaml"] = sources["data/events.yaml"]
+    .replace(/      - speaker: "天依わな"\r?\n        text:/, "      - text:");
+
+  const result = loadGameData(sources);
+
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.data["data/events.yaml"].events[0].dialogue[0].speaker, undefined);
+});
+
+test("validates optional dialogue display modes and rejects unsupported values", async () => {
+  const validSources = await loadSources();
+  validSources["data/events.yaml"] = validSources["data/events.yaml"]
+    .replace('      - speaker: "天依わな"', '      - displayMode: fullscreen\n        speaker: "天依わな"');
+
+  const validResult = loadGameData(validSources);
+  assert.deepEqual(validResult.errors, []);
+  assert.equal(validResult.data["data/events.yaml"].events[0].dialogue[0].displayMode, "fullscreen");
+
+  const invalidSources = await loadSources();
+  invalidSources["data/events.yaml"] = invalidSources["data/events.yaml"]
+    .replace('      - speaker: "天依わな"', '      - displayMode: overlay\n        speaker: "天依わな"');
+
+  const invalidResult = loadGameData(invalidSources);
+  assert.equal(invalidResult.data, null);
+  assert.ok(invalidResult.errors.some((error) => error.includes('displayMode must be "bottom" or "fullscreen"')));
+});
+
 test("treats missing required fields as fatal and non-blocking issues as warnings", async () => {
   const missingFieldSources = await loadSources();
   missingFieldSources["data/events.yaml"] = missingFieldSources["data/events.yaml"]
