@@ -5,6 +5,7 @@ const CONDITION_OPERATORS = new Set(["eq", "ne", "gt", "gte", "lt", "lte", "in"]
 const IDENTIFIER_PATTERN = /^[a-z][a-zA-Z0-9_-]*$/;
 const FLAG_PATTERN = /^[a-z][a-zA-Z0-9_]*$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const NUMERIC_OPERATORS = new Set(["gt", "gte", "lt", "lte"]);
 
 function isRecord(value) {
@@ -174,6 +175,10 @@ function validateStages(stages, errors) {
     errors.push("data/stages.yaml: stages must be an array.");
     return [];
   }
+  if (!isRecord(stages.schedule) || !TIME_PATTERN.test(stages.schedule.startTime) ||
+    !TIME_PATTERN.test(stages.schedule.endTime)) {
+    errors.push("data/stages.yaml: schedule.startTime and schedule.endTime must use HH:MM.");
+  }
 
   if (stages.stages.length !== 52) {
     errors.push(`data/stages.yaml: expected 52 stages, found ${stages.stages.length}.`);
@@ -227,7 +232,7 @@ function validateEndings(indexData, scenarioSources, errors, warnings) {
       errors.push(`${path}: ending must be an object.`);
       return;
     }
-    for (const key of ["id", "title", "scenario"]) {
+    for (const key of ["id", "title", "scenario", "trigger"]) {
       if (!(key in ending)) {
         errors.push(`${path}: missing required field "${key}".`);
       }
@@ -241,6 +246,17 @@ function validateEndings(indexData, scenarioSources, errors, warnings) {
     }
     if (typeof ending.title !== "string" || !ending.title.trim()) {
       errors.push(`${path}: title must be a non-empty string.`);
+    }
+    if (!isRecord(ending.trigger) ||
+      !["immediate", "stageEnd"].includes(ending.trigger.timing)) {
+      errors.push(`${path}: trigger.timing must be immediate or stageEnd.`);
+    } else {
+      if (ending.trigger.timing === "stageEnd" &&
+        (!Number.isInteger(ending.trigger.stageNumber) ||
+          ending.trigger.stageNumber < 1 || ending.trigger.stageNumber > 52)) {
+        errors.push(`${path}: stageEnd triggers require a stageNumber from 1 to 52.`);
+      }
+      validateCondition(ending.trigger.condition, `${path}.trigger.condition`, errors);
     }
     if (typeof ending.scenario !== "string" || !(ending.scenario in scenarioSources)) {
       errors.push(`${path}: scenario "${String(ending.scenario)}" does not exist.`);
@@ -262,6 +278,96 @@ function validateEndings(indexData, scenarioSources, errors, warnings) {
   }
 
   return ids;
+}
+
+function validateSettings(settings, errors) {
+  if (!isRecord(settings) || !isRecord(settings.parameters) ||
+    !isRecord(settings.difficulty) || !isRecord(settings.eventSelection)) {
+    errors.push("data/settings.yaml: parameters, difficulty, and eventSelection objects are required.");
+    return;
+  }
+
+  for (const parameter of PARAMETER_NAMES) {
+    const definition = settings.parameters[parameter];
+    if (!isRecord(definition) || typeof definition.initial !== "number" ||
+      (typeof definition.min !== "number" && parameter !== "stamina")) {
+      errors.push(`data/settings.yaml: parameter "${parameter}" requires numeric initial and a valid minimum.`);
+      continue;
+    }
+    if ((typeof definition.min === "number" && definition.initial < definition.min) ||
+      (typeof definition.max === "number" && definition.initial > definition.max)) {
+      errors.push(`data/settings.yaml: parameter "${parameter}" initial value is out of range.`);
+    }
+  }
+  if (settings.parameters.affection?.min !== 0 || settings.parameters.affection?.max !== 100) {
+    errors.push("data/settings.yaml: affection range must be 0 to 100.");
+  }
+  if (settings.parameters.stamina?.max !== 100 ||
+    settings.parameters.subscribers?.min !== 0) {
+    errors.push("data/settings.yaml: stamina max must be 100 and subscribers min must be 0.");
+  }
+
+  for (const difficultyId of ["sweet", "spicy"]) {
+    const difficulty = settings.difficulty[difficultyId];
+    if (!isRecord(difficulty) || typeof difficulty.label !== "string" ||
+      !difficulty.label.trim() ||
+      !["staminaCostMultiplier", "affectionChangeMultiplier", "exhaustionPenaltyMultiplier"]
+        .every((key) => typeof difficulty[key] === "number" && difficulty[key] >= 0)) {
+      errors.push(`data/settings.yaml: difficulty "${difficultyId}" is incomplete or invalid.`);
+    }
+  }
+  if (typeof settings.staminaShortageAffectionPenaltyPerPoint !== "number" ||
+    settings.staminaShortageAffectionPenaltyPerPoint < 0) {
+    errors.push("data/settings.yaml: stamina shortage penalty coefficient must be non-negative.");
+  }
+  if (typeof settings.eventSelection.uncollectedEndingWeight !== "number" ||
+    settings.eventSelection.uncollectedEndingWeight < 0) {
+    errors.push("data/settings.yaml: uncollectedEndingWeight must be non-negative.");
+  }
+}
+
+function validateActions(actionData, errors) {
+  if (!isRecord(actionData) || !Array.isArray(actionData.actions)) {
+    errors.push("data/actions.yaml: actions must be an array.");
+    return;
+  }
+
+  const actionIds = new Set();
+  for (const [index, action] of actionData.actions.entries()) {
+    const path = `data/actions.yaml: actions[${index}]`;
+    if (!isRecord(action)) {
+      errors.push(`${path}: action must be an object.`);
+      continue;
+    }
+    for (const key of ["id", "category", "label", "timeCostMinutes", "staminaCost", "effects"]) {
+      if (!(key in action)) {
+        errors.push(`${path}: missing required field "${key}".`);
+      }
+    }
+    if (typeof action.id !== "string" || !IDENTIFIER_PATTERN.test(action.id)) {
+      errors.push(`${path}: invalid action ID.`);
+    } else if (actionIds.has(action.id)) {
+      errors.push(`${path}: duplicate action ID "${action.id}".`);
+    } else {
+      actionIds.add(action.id);
+    }
+    if (typeof action.category !== "string" || !action.category.trim() ||
+      typeof action.label !== "string" || !action.label.trim()) {
+      errors.push(`${path}: category and label must be non-empty strings.`);
+    }
+    if (!Number.isInteger(action.timeCostMinutes) || action.timeCostMinutes < 0 ||
+      typeof action.staminaCost !== "number" || action.staminaCost < 0) {
+      errors.push(`${path}: timeCostMinutes and staminaCost must be non-negative.`);
+    }
+    if (isRecord(action.effects)) {
+      validateEffects({
+        ...action.effects,
+        flagChanges: action.effects.flagChanges ?? {},
+      }, `${path}.effects`, errors);
+    } else {
+      errors.push(`${path}: effects must be an object.`);
+    }
+  }
 }
 
 function validateEvents(eventData, stageIds, endingIds, errors, warnings) {
@@ -382,6 +488,8 @@ export function loadGameData(sources) {
 
   if (errors.length === 0) {
     const stageIds = new Set(validateStages(parsed["data/stages.yaml"], errors));
+    validateSettings(parsed["data/settings.yaml"], errors);
+    validateActions(parsed["data/actions.yaml"], errors);
     const endingIds = validateEndings(
       parsed["data/endings/index.yaml"],
       parsed.endingScenarios ?? {},

@@ -19,6 +19,8 @@ for (const fileName of scenarioFiles) {
 
 const result = loadGameData({
   "data/stages.yaml": await readYaml("data/stages.yaml"),
+  "data/settings.yaml": await readYaml("data/settings.yaml"),
+  "data/actions.yaml": await readYaml("data/actions.yaml"),
   "data/events.yaml": await readYaml("data/events.yaml"),
   "data/endings/index.yaml": await readYaml("data/endings/index.yaml"),
   endingScenarios,

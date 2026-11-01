@@ -1,18 +1,28 @@
-import abandonmentScenario from "../../data/endings/scenarios/abandonment.yaml?raw";
-import completionScenario from "../../data/endings/scenarios/completion.yaml?raw";
+import actions from "../../data/actions.yaml?raw";
 import endingsIndex from "../../data/endings/index.yaml?raw";
 import events from "../../data/events.yaml?raw";
+import settings from "../../data/settings.yaml?raw";
 import stages from "../../data/stages.yaml?raw";
 import { loadGameData } from "./validate.js";
 
+const endingScenarioFiles = import.meta.glob("../../data/endings/scenarios/*.yaml", {
+  eager: true,
+  import: "default",
+  query: "?raw",
+});
+
 const result = loadGameData({
   "data/stages.yaml": stages,
+  "data/settings.yaml": settings,
+  "data/actions.yaml": actions,
   "data/events.yaml": events,
   "data/endings/index.yaml": endingsIndex,
-  endingScenarios: {
-    "scenarios/abandonment.yaml": abandonmentScenario,
-    "scenarios/completion.yaml": completionScenario,
-  },
+  endingScenarios: Object.fromEntries(
+    Object.entries(endingScenarioFiles).map(([path, source]) => [
+      `scenarios/${path.split("/").at(-1)}`,
+      source,
+    ]),
+  ),
 });
 
 if (result.errors.length > 0) {

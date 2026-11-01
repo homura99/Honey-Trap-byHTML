@@ -1,0 +1,27 @@
+version: 1
+status: development-placeholder
+parameters:
+  affection:
+    initial: 10
+    min: 0
+    max: 100
+  stamina:
+    initial: 100
+    max: 100
+  subscribers:
+    initial: 1
+    min: 0
+difficulty:
+  sweet:
+    label: "甘口"
+    staminaCostMultiplier: 1
+    affectionChangeMultiplier: 1
+    exhaustionPenaltyMultiplier: 1
+  spicy:
+    label: "辛口"
+    staminaCostMultiplier: 1.2
+    affectionChangeMultiplier: 0.8
+    exhaustionPenaltyMultiplier: 1.5
+staminaShortageAffectionPenaltyPerPoint: 0.1
+eventSelection:
+  uncollectedEndingWeight: 10

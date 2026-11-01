@@ -4,6 +4,21 @@ endings:
   - id: abandonment
     title: "途中離脱（仮）"
     scenario: scenarios/abandonment.yaml
+    trigger:
+      timing: immediate
+      condition:
+        all:
+          - flag: abandonment_requested
+            operator: eq
+            value: true
   - id: completion
     title: "完走（仮）"
     scenario: scenarios/completion.yaml
+    trigger:
+      timing: stageEnd
+      stageNumber: 52
+      condition:
+        all:
+          - parameter: subscribers
+            operator: gte
+            value: 0

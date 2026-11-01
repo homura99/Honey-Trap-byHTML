@@ -29,7 +29,17 @@ events:
           flagChanges:
             sample_event_seen: true
         nextEventId: sample-follow-up
+      - id: leave-early
+        text: "活動を終了する（検証用）"
+        effects:
+          parameterChanges:
+            affection: 0
+            subscribers: 0
+            stamina: 0
+          flagChanges:
+            abandonment_requested: true
     relatedEndingIds:
+      - abandonment
       - completion
     deferPolicy:
       enabled: true

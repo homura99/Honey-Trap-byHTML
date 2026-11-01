@@ -6,6 +6,8 @@ import { loadGameData } from "../src/data/validate.js";
 async function loadSources() {
   return {
     "data/stages.yaml": await readFile(new URL("../data/stages.yaml", import.meta.url), "utf8"),
+    "data/settings.yaml": await readFile(new URL("../data/settings.yaml", import.meta.url), "utf8"),
+    "data/actions.yaml": await readFile(new URL("../data/actions.yaml", import.meta.url), "utf8"),
     "data/events.yaml": await readFile(new URL("../data/events.yaml", import.meta.url), "utf8"),
     "data/endings/index.yaml": await readFile(
       new URL("../data/endings/index.yaml", import.meta.url),

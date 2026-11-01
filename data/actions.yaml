@@ -1,0 +1,83 @@
+version: 1
+status: development-placeholder
+actions:
+  - id: conversation
+    category: conversation
+    label: "会話"
+    timeCostMinutes: 30
+    staminaCost: 5
+    effects:
+      parameterChanges:
+        affection: 2
+        subscribers: 0
+        stamina: 0
+  - id: travel
+    category: movement
+    label: "移動"
+    timeCostMinutes: 60
+    staminaCost: 8
+    effects:
+      parameterChanges:
+        affection: 0
+        subscribers: 0
+        stamina: 0
+  - id: meal
+    category: meal
+    label: "食事"
+    timeCostMinutes: 30
+    staminaCost: 0
+    effects:
+      parameterChanges:
+        affection: 0
+        subscribers: 0
+        stamina: 25
+  - id: rest
+    category: rest
+    label: "休憩"
+    timeCostMinutes: 60
+    staminaCost: 0
+    effects:
+      parameterChanges:
+        affection: 0
+        subscribers: 0
+        stamina: 40
+  - id: practice
+    category: study-practice
+    label: "勉強・練習"
+    timeCostMinutes: 90
+    staminaCost: 15
+    effects:
+      parameterChanges:
+        affection: 1
+        subscribers: 0
+        stamina: 0
+  - id: stream-preparation
+    category: stream-preparation
+    label: "配信準備"
+    timeCostMinutes: 60
+    staminaCost: 10
+    effects:
+      parameterChanges:
+        affection: 0
+        subscribers: 0
+        stamina: 0
+  - id: stream
+    category: stream
+    label: "配信"
+    timeCostMinutes: 120
+    staminaCost: 30
+    effects:
+      parameterChanges:
+        affection: 2
+        subscribers: 5
+        stamina: 0
+  - id: special
+    category: special-event
+    label: "特殊イベント"
+    timeCostMinutes: 0
+    staminaCost: 0
+    effects:
+      parameterChanges:
+        affection: 0
+        subscribers: 0
+        stamina: 0
