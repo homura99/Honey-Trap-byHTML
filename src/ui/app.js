@@ -15,10 +15,12 @@ const SAVE_SLOT_IDS = [...SAVE_SLOTS.manual, SAVE_SLOTS.auto];
 const INTERACTIVE_SELECTOR = "button, a, input, select, textarea, [contenteditable='true']";
 
 export class GameApp {
-  constructor(root, gameData, repository) {
+  constructor(root, gameData, repository, options = {}) {
     this.root = root;
     this.gameData = gameData;
     this.repository = repository;
+    this.authUser = options.authUser ?? null;
+    this.connectGoogle = options.connectGoogle ?? null;
     this.screen = "home";
     this.saveMode = "load";
     this.engine = null;
@@ -38,10 +40,12 @@ export class GameApp {
     this.presentationController = new PresentationController();
     this.handleClick = this.handleClick.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   mount() {
     this.root.addEventListener("click", this.handleClick);
+    this.root.addEventListener("change", this.handleChange);
     this.root.ownerDocument.addEventListener("keydown", this.handleKeyDown);
     this.render();
     void this.refreshSlots();
@@ -119,6 +123,8 @@ export class GameApp {
       resultTitle: this.resultTitle,
       resultMessage: this.resultMessage,
       resultDialogue: this.resultDialogue,
+      authStatus: this.authUser?.isAnonymous ? "ゲスト利用中" : "Google連携済み",
+      googleLinked: Boolean(this.authUser && !this.authUser.isAnonymous),
     };
   }
 
@@ -166,6 +172,20 @@ export class GameApp {
 
   errorMessage(error) {
     return error instanceof Error ? error.message : String(error);
+  }
+
+  async updateAuthUser(user) {
+    const previousUserId = this.authUser?.uid;
+    this.authUser = user;
+    if (previousUserId && user?.uid !== previousUserId) {
+      this.engine = null;
+      this.currentEvent = null;
+      this.screen = "home";
+      this.showMessage("Googleアカウントを切り替えました。切替前のアカウントのセーブは別管理です。");
+    } else {
+      this.render();
+    }
+    await Promise.all([this.refreshSlots(), this.refreshEndings()]);
   }
 
   makeEngine(difficultyId) {
@@ -290,6 +310,12 @@ export class GameApp {
         case "export-slot":
           await this.exportSlot(value);
           break;
+        case "import-save":
+          this.root.querySelector("#save-import-file")?.click();
+          break;
+        case "connect-google":
+          await this.connectGoogleAccount();
+          break;
         case "perform-action":
           await this.performAction(value);
           break;
@@ -322,6 +348,74 @@ export class GameApp {
       }
     } catch (error) {
       this.showMessage(this.errorMessage(error), "error");
+    }
+  }
+
+  async handleChange(event) {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || input.id !== "save-import-file") {
+      return;
+    }
+    const file = input.files?.[0];
+    input.value = "";
+    if (!file) {
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      this.showMessage("セーブJSONは1MB以下のファイルを選択してください。", "error");
+      return;
+    }
+
+    try {
+      const json = await file.text();
+      let slotId;
+      try {
+        slotId = JSON.parse(json)?.slot?.slotId;
+      } catch {
+        throw new Error("JSONファイルを解析できません。");
+      }
+      if (!SAVE_SLOT_IDS.includes(slotId)) {
+        throw new Error("JSONファイルに有効なセーブ枠がありません。");
+      }
+      const existingSlot = this.slots.find((slot) => slot.slotId === slotId);
+      if (existingSlot?.occupied && !this.root.ownerDocument.defaultView.confirm(
+        `クラウドの${slotId}をインポートしたデータで上書きしますか？`,
+      )) {
+        return;
+      }
+      await this.repository.importSlotJson(json);
+      await this.refreshSlots();
+      this.showMessage(`${slotId} をクラウドにインポートしました。`);
+    } catch (error) {
+      this.showMessage(`セーブJSONをクラウドに取り込めませんでした: ${this.errorMessage(error)}`, "error");
+    }
+  }
+
+  async connectGoogleAccount() {
+    if (!this.connectGoogle) {
+      this.showMessage("Google連携を利用できません。Firebase設定を確認してください。", "error");
+      return;
+    }
+    this.busy = true;
+    this.render();
+    try {
+      const result = await this.connectGoogle();
+      this.busy = false;
+      if (result.switchedAccount) {
+        this.showMessage("既存のGoogleアカウントにログインしました。アカウント間でセーブは統合されません。");
+      } else {
+        this.showMessage("Googleアカウントを連携しました。");
+      }
+      if (result.notificationError) {
+        this.showMessage(
+          `認証は完了しましたが、Webhook通知に失敗しました: ${this.errorMessage(result.notificationError)}`,
+          "error",
+        );
+      }
+      await Promise.all([this.refreshSlots(), this.refreshEndings()]);
+    } catch (error) {
+      this.busy = false;
+      this.showMessage(`Google連携に失敗しました: ${this.errorMessage(error)}`, "error");
     }
   }
 

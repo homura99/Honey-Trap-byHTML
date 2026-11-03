@@ -59,6 +59,21 @@ test("renders a dedicated loading state for save restoration", () => {
   assert.match(html, /aria-busy="true"/);
 });
 
+test("renders cloud save import and Google account linking controls", () => {
+  const loadHtml = renderApp({ ...baseView, screen: "load" });
+  const settingsHtml = renderApp({
+    ...baseView,
+    screen: "settings",
+    authStatus: "ゲスト利用中",
+    googleLinked: false,
+  });
+
+  assert.match(loadHtml, /エクスポート済みJSONをクラウドへ取り込む/);
+  assert.match(loadHtml, /type="file" accept="application\/json,\.json"/);
+  assert.match(settingsHtml, /Googleアカウントを連携/);
+  assert.match(settingsHtml, /認証情報はWebhookへ送信しません/);
+});
+
 test("renders YAML-driven event dialogue and choices with escaped text", () => {
   const html = renderApp({
     ...baseView,

@@ -224,6 +224,13 @@ function saves(view) {
       <p class="eyebrow">${view.saveMode === "save" ? "SAVE" : "LOAD"}</p>
       <h1>${view.saveMode === "save" ? "セーブ" : "ロード"}</h1>
       <p class="muted">保存日時と進行ステージを確認できます。オートセーブは自動で更新されます。</p>
+      ${view.saveMode === "load" ? `
+        <div class="import-save-panel">
+          ${button("エクスポート済みJSONをクラウドへ取り込む", "import-save", { kind: "quiet" })}
+          <input id="save-import-file" class="visually-hidden" type="file" accept="application/json,.json" aria-label="インポートするセーブJSON">
+          <p class="muted small">選択したJSON内のスロットに取り込みます。既存のクラウドセーブは確認後に上書きします。</p>
+        </div>
+      ` : ""}
       <div class="slot-grid">
         ${view.slots.map((slot) => {
     const stage = slot.progress
@@ -273,6 +280,14 @@ function settings(view) {
     <section class="panel narrow-panel">
       <p class="eyebrow">CONFIG / 仮画面</p>
       <h1>設定</h1>
+      <section class="account-panel">
+        <h2>クラウドアカウント</h2>
+        <p>状態: ${escapeHtml(view.authStatus ?? "未接続")}</p>
+        ${view.googleLinked
+    ? `<p class="muted">Googleアカウントと連携済みです。</p>`
+    : button("Googleアカウントを連携", "connect-google", { kind: "primary" })}
+        <p class="muted small">セーブはFirebaseクラウドに保存されます。認証情報はWebhookへ送信しません。</p>
+      </section>
       <h2>操作方法</h2>
       <ul class="instruction-list">
         <li>ボタンはマウス・タッチで操作できます。</li>

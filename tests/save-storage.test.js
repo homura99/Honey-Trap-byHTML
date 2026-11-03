@@ -9,6 +9,7 @@ import {
   IndexedDBSaveRepository,
   SAVE_SLOTS,
 } from "../src/storage/indexeddb-save-repository.js";
+import { parseSaveExport } from "../src/storage/save-export.js";
 
 async function loadGameDataFixture() {
   const root = new URL("../data/", import.meta.url);
@@ -210,7 +211,7 @@ test("shares ending collection across slots and calculates completion rate", asy
   assert.deepEqual(await repository.addCollectedEnding("abandonment"), ["abandonment"]);
 });
 
-test("exports a saved slot as versioned JSON without adding an import operation", async (t) => {
+test("exports a saved slot as versioned JSON", async (t) => {
   const { engine, repository } = await createHarness();
   t.after(() => repository.close());
 
@@ -222,6 +223,30 @@ test("exports a saved slot as versioned JSON without adding an import operation"
   assert.equal(exported.slot.slotId, "manual-4");
   assert.equal(exported.slot.gameState.schemaVersion, 1);
   assert.equal(typeof exported.exportedAt, "string");
+});
+
+test("validates exported save JSON before cloud import", async (t) => {
+  const { engine, gameData, repository } = await createHarness();
+  t.after(() => repository.close());
+
+  await repository.saveManual(engine, "manual-2");
+  const json = await repository.exportSlotJson("manual-2");
+  const imported = parseSaveExport(gameData, json);
+
+  assert.equal(imported.slotId, "manual-2");
+  assert.equal(imported.gameState.difficultyId, "sweet");
+  const invalidProgress = JSON.parse(json);
+  invalidProgress.slot.progress.currentStageNumber = 99;
+  assert.throws(
+    () => parseSaveExport(gameData, JSON.stringify(invalidProgress)),
+    /progress summary|進行状況/,
+  );
+  const invalidSlot = JSON.parse(json);
+  invalidSlot.slot.slotId = "unknown";
+  assert.throws(
+    () => parseSaveExport(gameData, JSON.stringify(invalidSlot)),
+    /slot ID|スロットID/,
+  );
 });
 
 test("detects corrupt saves and refuses to load or overwrite them", async (t) => {

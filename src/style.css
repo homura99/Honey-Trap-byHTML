@@ -510,6 +510,25 @@ progress {
   line-height: 1.8;
 }
 
+.account-panel,
+.import-save-panel {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface-raised);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
 .result-screen {
   width: min(100%, 52rem);
   margin: 2rem auto;

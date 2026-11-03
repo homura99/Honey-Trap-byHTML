@@ -160,6 +160,10 @@ export class IndexedDBSaveRepository {
         try {
           if (request.result) {
             validateExisting(request.result);
+            const previousTimestamp = Date.parse(request.result.savedAt);
+            if (Date.parse(record.savedAt) <= previousTimestamp) {
+              record.savedAt = new Date(previousTimestamp + 1).toISOString();
+            }
           }
           store.put(record);
           result = record;
