@@ -270,7 +270,7 @@ Firebase Consoleで匿名認証・Googleプロバイダー・Cloud Firestoreを�
 }
 
 .button--primary {
-  color: var(--bg-main);
+  color: var(--text-color);
   background: var(--accent-pink);
 }
 

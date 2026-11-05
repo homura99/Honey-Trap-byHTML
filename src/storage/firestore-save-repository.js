@@ -1,8 +1,6 @@
 import {
-  collection,
   doc,
   getDoc,
-  getDocs,
   runTransaction,
 } from "firebase/firestore";
 import { validateGameSnapshot } from "../game/save-state.js";
@@ -152,11 +150,13 @@ export class FirestoreSaveRepository {
 
   async listSlots() {
     const userId = this.#userId();
-    const snapshot = await getDocs(collection(this.database, "users", userId, "slots"));
-    const records = new Map(snapshot.docs.map((entry) => [entry.id, entry.data()]));
+    const records = await Promise.all(ALL_SLOT_IDS.map(async (slotId) => {
+      const snapshot = await getDoc(this.#slotReference(userId, slotId));
+      return snapshot.exists() ? snapshot.data() : null;
+    }));
 
-    return ALL_SLOT_IDS.map((slotId) => {
-      const record = records.get(slotId);
+    return ALL_SLOT_IDS.map((slotId, index) => {
+      const record = records[index];
       if (!record) {
         return {
           slotId,
