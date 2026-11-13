@@ -57,6 +57,20 @@ Copy-Item .env.example .env.local
 
 必須設定が空のままではゲームを起動できません。Firebase Authenticationの匿名認証とCloud Firestoreも有効にしてください。
 
+### Cloudflare Pagesで公開する
+
+Cloudflare PagesのGit連携設定は次のとおりです。
+
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Root directory: リポジトリのルート（通常は空欄）
+
+`dist` はViteが生成する本番用ファイルです。リポジトリのルートをそのまま静的ファイルとして公開すると、未ビルドの `/src/main.js` が読み込まれ、CSSやYAMLをJavaScriptモジュールとして扱うエラーになります。設定を保存したら再デプロイしてください。
+
+Direct Uploadを使う場合は、ローカルで `npm run build` を実行し、生成された `dist` フォルダーの中身をアップロードしてください。リポジトリのソース一式はアップロードしないでください。
+
+Firebase設定値はCloudflare Pagesの環境変数にも登録してください。Viteはビルド時に `VITE_` で始まる環境変数を取り込むため、ProductionとPreviewそれぞれ必要な環境へ登録した後に再ビルド・再デプロイします。デプロイ後のページソースで `/src/main.js` ではなく `/assets/` 配下のJavaScriptとCSSが参照されていることを確認してください。
+
 ## 4. ゲーム進行
 
 2025年4月から2026年3月までの52ステージで構成する。
