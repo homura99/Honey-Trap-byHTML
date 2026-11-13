@@ -1022,7 +1022,7 @@ progress {
 
 .scene-action-preview {
   display: none;
-  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
   padding: 0.5rem 0.65rem;
   border: 1px solid var(--border);
   border-radius: 0.5rem;

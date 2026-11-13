@@ -220,6 +220,7 @@ test("renders in-game action choices with engine-derived changes on hover or foc
   assert.match(html, /class="scene-action-panel" aria-label="行動選択肢"/);
   assert.match(html, /data-action="perform-action" data-value="conversation"/);
   assert.match(html, /好感度 \+2 \/ スタミナ -5/);
+  assert.ok(html.indexOf("class=\"scene-action-preview\"") < html.indexOf("data-action=\"perform-action\""));
 });
 
 test("supports multiple CSS silhouette placeholders with bounded layout values", () => {

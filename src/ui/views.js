@@ -153,6 +153,10 @@ function actionChoices(view) {
     const preview = action.preview;
     return `
           <article class="scene-action-choice">
+            <div class="scene-action-preview">
+              <p>${escapeHtml(action.description ?? "この行動の説明は未設定です。")}</p>
+              <p>スタミナ消費 ${escapeHtml(preview?.staminaCost ?? "—")} ・ ${escapeHtml(parameterChangeText(preview))}</p>
+            </div>
             ${button(
     `${action.label} ・ ${preview?.timeCostMinutes ?? action.timeCostMinutes}分`,
     "perform-action",
@@ -161,10 +165,6 @@ function actionChoices(view) {
       disabled: !view.canPerformActions || !preview,
     },
   )}
-            <div class="scene-action-preview">
-              <p>${escapeHtml(action.description ?? "この行動の説明は未設定です。")}</p>
-              <p>スタミナ消費 ${escapeHtml(preview?.staminaCost ?? "—")} ・ ${escapeHtml(parameterChangeText(preview))}</p>
-            </div>
           </article>
         `;
   }).join("")}
