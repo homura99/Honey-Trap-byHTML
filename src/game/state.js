@@ -28,6 +28,7 @@ export class GameState {
     this.affection = settings.parameters.affection.initial;
     this.stamina = settings.parameters.stamina.initial;
     this.subscribers = settings.parameters.subscribers.initial;
+    this.streamCount = 0;
     this.storyFlags = {};
     this.eventHistory = [];
     this.eventCooldowns = {};
@@ -57,6 +58,7 @@ export class GameState {
       affection: this.affection,
       stamina: this.stamina,
       subscribers: this.subscribers,
+      streamCount: this.streamCount,
       storyFlags: this.storyFlags,
       eventHistory: this.eventHistory,
       eventCooldowns: this.eventCooldowns,

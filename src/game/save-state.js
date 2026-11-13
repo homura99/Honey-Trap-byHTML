@@ -47,6 +47,10 @@ export function validateGameSnapshot(gameData, snapshot) {
   if (!Number.isSafeInteger(snapshot.subscribers) || snapshot.subscribers < 0) {
     fail("Subscribers must be a non-negative safe integer.");
   }
+  if (snapshot.streamCount !== undefined &&
+    (!Number.isSafeInteger(snapshot.streamCount) || snapshot.streamCount < 0)) {
+    fail("Stream count must be a non-negative safe integer.");
+  }
   if (!hasScalarValues(snapshot.storyFlags)) {
     fail("Story flags must be an object containing scalar values.");
   }

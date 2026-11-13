@@ -70,13 +70,12 @@ actions:
   - id: stream
     category: stream
     label: "配信"
-    description: "配信を行い、活動と登録者数を伸ばす。"
+    description: "配信を行い、登録者数をフィボナッチ式（20%減）で伸ばす。"
     timeCostMinutes: 120
     staminaCost: 30
     effects:
       parameterChanges:
         affection: 2
-        subscribers: 5
         stamina: 0
   - id: special
     category: special-event

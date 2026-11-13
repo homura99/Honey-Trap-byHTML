@@ -74,10 +74,10 @@ test("applies action costs, shortage penalties, parameter bounds, and returns di
   assert.equal(engine.state.stamina, -28);
   assert.equal(result.displayStamina, 0);
   assert.ok(Math.abs(engine.state.affection - 97.2) < Number.EPSILON * 16);
-  assert.equal(engine.state.subscribers, 6);
+  assert.equal(engine.state.subscribers, 1);
   assert.equal(result.parameterChanges.stamina, -30);
   assert.ok(Math.abs(result.parameterChanges.affection + 1.8) < Number.EPSILON * 16);
-  assert.equal(result.parameterChanges.subscribers, 5);
+  assert.equal(result.parameterChanges.subscribers, 0);
   assert.equal(result.time.time, "02:00");
 
   const cappedEngine = new GameEngine(data, "sweet");
@@ -96,10 +96,61 @@ test("previews action cost and state changes without mutating the game", async (
 
   assert.equal(preview.timeCostMinutes, 120);
   assert.equal(preview.staminaCost, 36);
-  assert.equal(preview.parameterChanges.subscribers, 5);
+  assert.equal(preview.parameterChanges.subscribers, 0);
   assert.deepEqual(engine.createSaveSnapshot(), initialSnapshot);
   const result = await engine.performAction("stream");
   assert.deepEqual(result.parameterChanges, preview.parameterChanges);
+});
+
+test("applies floored 80% Fibonacci subscriber growth per stream and restores its count", async () => {
+  const data = await loadGameDataFixture();
+  const engine = new GameEngine(data, "sweet");
+  const expectedGains = [0, 0, 1, 2, 4, 6, 10, 16];
+
+  assert.equal(engine.previewAction("stream").parameterChanges.subscribers, expectedGains[0]);
+  assert.equal(engine.state.streamCount, 0);
+
+  for (const expectedGain of expectedGains.slice(0, 3)) {
+    const result = await engine.performAction("stream");
+    assert.equal(result.parameterChanges.subscribers, expectedGain);
+  }
+
+  const snapshot = engine.createSaveSnapshot();
+  assert.equal(snapshot.streamCount, 3);
+  engine.restoreState(snapshot);
+  for (const expectedGain of expectedGains.slice(3)) {
+    const result = await engine.performAction("stream");
+    assert.equal(result.parameterChanges.subscribers, expectedGain);
+  }
+});
+
+test("loads existing saves without a stream count as zero", async () => {
+  const data = await loadGameDataFixture();
+  const engine = new GameEngine(data, "sweet");
+  const snapshot = engine.createSaveSnapshot();
+  delete snapshot.streamCount;
+
+  engine.restoreState(snapshot);
+
+  assert.equal(engine.state.streamCount, 0);
+  assert.equal((await engine.performAction("stream")).parameterChanges.subscribers, 0);
+});
+
+test("keeps event subscriber changes independent from stream growth", async () => {
+  const data = await loadGameDataFixture();
+  const choice = data["data/events.yaml"].events[0].choices.find(({ id }) =>
+    id === "leave-early");
+  choice.effects.parameterChanges.subscribers = 7;
+  const engine = new GameEngine(data, "sweet");
+  engine.state.storyFlags.sample_event_unlocked = true;
+  await engine.performAction("stream");
+  await engine.performAction("stream");
+
+  engine.startEvent("sample-arrival");
+  engine.chooseEventOption("leave-early");
+
+  assert.equal(engine.state.subscribers, 8);
+  assert.equal(engine.state.streamCount, 2);
 });
 
 test("moves between stages only after confirmation and preserves time overrun", async () => {

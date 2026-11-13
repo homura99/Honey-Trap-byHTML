@@ -1,6 +1,25 @@
 import { applyEffects, getDisplayStamina } from "./effects.js";
 import { advanceGameTime, getDisplayTime } from "./time.js";
 
+function getSubscriberGrowth(streamCount, currentSubscribers) {
+  let previous = 0;
+  let current = 1;
+  for (let index = 0; index < streamCount; index += 1) {
+    const next = previous + current;
+    if (!Number.isSafeInteger(next)) {
+      current = Number.MAX_SAFE_INTEGER;
+      break;
+    }
+    previous = current;
+    current = next;
+  }
+
+  return Math.min(
+    Math.floor(current * 0.8),
+    Number.MAX_SAFE_INTEGER - currentSubscribers,
+  );
+}
+
 export function executeAction(gameData, state, actionId) {
   if (state.endingReached || state.campaignComplete) {
     throw new Error("Actions cannot be performed after the campaign has ended.");
@@ -26,7 +45,16 @@ export function executeAction(gameData, state, actionId) {
     subscribers: state.subscribers,
   };
   state.stamina -= staminaCost;
-  applyEffects(gameData, state, action.effects, difficulty);
+  const effects = action.category === "stream"
+    ? {
+      ...action.effects,
+      parameterChanges: {
+        ...action.effects.parameterChanges,
+        subscribers: getSubscriberGrowth(state.streamCount, state.subscribers),
+      },
+    }
+    : action.effects;
+  applyEffects(gameData, state, effects, difficulty);
 
   const exhaustionPenalty = staminaShortage *
     gameData["data/settings.yaml"].staminaShortageAffectionPenaltyPerPoint *
@@ -37,6 +65,9 @@ export function executeAction(gameData, state, actionId) {
   }
 
   advanceGameTime(gameData, state, action.timeCostMinutes);
+  if (action.category === "stream") {
+    state.streamCount = Math.min(state.streamCount + 1, Number.MAX_SAFE_INTEGER);
+  }
   return {
     actionId: action.id,
     category: action.category,
