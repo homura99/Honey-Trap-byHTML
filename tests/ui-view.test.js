@@ -163,6 +163,24 @@ test("renders compact stage parameters while keeping action choices closed durin
   assert.doesNotMatch(html, /scene-status|sidebar/);
 });
 
+test("formats subscriber counts with three-digit grouping in game and status screens", () => {
+  const gameHtml = renderApp({
+    ...baseView,
+    screen: "game",
+    engine: {},
+    subscribers: 1234567,
+  });
+  const statusHtml = renderApp({
+    ...baseView,
+    screen: "status",
+    engine: {},
+    subscribers: 1234567,
+  });
+
+  assert.match(gameHtml, /登録者数<\/span><strong>1,234,567<\/strong>/);
+  assert.match(statusHtml, /<dt>登録者数<\/dt><dd>1,234,567<\/dd>/);
+});
+
 test("keeps the development-only sample event control in the auxiliary menu", () => {
   const html = renderApp({ ...baseView, screen: "menu", engine: {} });
 

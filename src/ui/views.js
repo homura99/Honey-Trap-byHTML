@@ -1,5 +1,7 @@
 import { renderScenePresentation } from "./presentation.js";
 
+const NUMBER_FORMATTER = new Intl.NumberFormat("ja-JP");
+
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (character) => ({
     "&": "&amp;",
@@ -226,7 +228,7 @@ function game(view) {
             <meter min="${escapeHtml(view.affectionMin)}" max="${escapeHtml(view.affectionMax)}" value="${escapeHtml(view.affection)}" aria-label="好感度"></meter>
           </div>
           <div class="scene-parameter scene-parameter--count">
-            <span>登録者数</span><strong>${escapeHtml(view.subscribers)}</strong>
+            <span>登録者数</span><strong>${escapeHtml(NUMBER_FORMATTER.format(view.subscribers))}</strong>
           </div>
         </section>
         <nav class="scene-controls" aria-label="ゲーム補助メニュー">
@@ -349,7 +351,7 @@ function statusScreen(view) {
         <dt>ステージ</dt><dd>${escapeHtml(view.stageNumber)} / 52 ・ ${escapeHtml(view.stageTitle)}</dd>
         <dt>スタミナ</dt><dd>${escapeHtml(view.displayStamina)} / ${escapeHtml(view.maxStamina)}</dd>
         <dt>好感度</dt><dd>${escapeHtml(view.affection)}</dd>
-        <dt>登録者数</dt><dd>${escapeHtml(view.subscribers)}</dd>
+        <dt>登録者数</dt><dd>${escapeHtml(NUMBER_FORMATTER.format(view.subscribers))}</dd>
         <dt>難易度</dt><dd>${escapeHtml(view.difficultyLabel)}</dd>
         <dt>イベント履歴</dt><dd>${escapeHtml(view.eventHistoryCount)} 件</dd>
         <dt>保留イベント</dt><dd>${escapeHtml(view.pendingEventCount)} 件</dd>
