@@ -1,5 +1,9 @@
 version: 1
 status: development-draft
+# 発生条件メモ（コメントのみ。実際の判定は各イベントの stageId / condition を参照）:
+# - sample-arrival: stage-01で好感度0以上、かつ sample_event_unlocked=true
+# - sample-follow-up: stage-01で sample_event_seen=true
+# - draft-week-01～52: 対応するステージ到達時に好感度0以上。各イベント1回のみ発生
 events:
   - id: sample-arrival
     stageId: stage-01
