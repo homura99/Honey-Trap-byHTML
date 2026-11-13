@@ -1,3 +1,4 @@
+/* 全体の色・文字・共通カラー変数。画面全体の配色を変えるときに調整 */
 :root {
   color-scheme: light;
   font-family:
@@ -7,14 +8,16 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --bg-main: #FAFAFC;
-  --window-bg: #FFF0F5;
-  --text-color: #2D1B2D;
+  --bg-main: #FAFAFC; /* ページ全体の背景色 */
+  --window-bg: #FFF0F5; /* 会話ウィンドウの基本背景色 */
+  --text-color: #2D1B2D; /* 本文・ボタンの基本文字色 */
   --accent-pink: #FF3366;
   --accent-ruby: #D61C4E;
+  /* パネル・カードの表面色 */
   --surface: #FFFFFF;
   --surface-raised: #FFF7FA;
   --text-muted: #6D5A69;
+  /* パネル・カードの境界線色 */
   --border: #2D1B2D24;
   --border-strong: #2D1B2D40;
   --danger: #A51E3D;
@@ -40,6 +43,7 @@
   box-sizing: border-box;
 }
 
+/* 全画面共通のページ背景と基本操作 */
 body {
   min-width: 320px;
   min-height: 100vh;
@@ -66,6 +70,7 @@ summary:focus-visible {
 }
 
 .app-shell {
+  /* 通常画面の最大幅と左右中央揃え */
   width: min(100% - 2rem, 76rem);
   min-height: 100vh;
   margin: 0 auto;
@@ -73,7 +78,9 @@ summary:focus-visible {
   flex-direction: column;
 }
 
+/* タイトルバー、ナビゲーション、各画面の共通コンテナ */
 .topbar {
+  /* 上部ヘッダーの高さ・左右配置 */
   min-height: 4.5rem;
   display: flex;
   align-items: center;
@@ -84,12 +91,14 @@ summary:focus-visible {
 }
 
 .brand {
+  /* ヘッダー内のタイトル文字 */
   color: var(--text-color);
   font-weight: 700;
   text-decoration: none;
 }
 
 .brand span {
+  /* タイトル横の小さな補足ラベル */
   margin-left: 0.4rem;
   color: var(--accent-ruby);
   font-size: 0.72rem;
@@ -98,6 +107,7 @@ summary:focus-visible {
 .top-nav,
 .toolbar,
 .home-actions {
+  /* ナビやボタン列の間隔 */
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -105,11 +115,13 @@ summary:focus-visible {
 }
 
 .page-content {
+  /* 通常画面のコンテンツ領域と上下余白 */
   flex: 1;
   padding: clamp(1rem, 3vw, 2rem) 0;
 }
 
 .panel {
+  /* 共通カードの内側余白・角丸・影 */
   color: var(--text-color);
   padding: clamp(1rem, 3vw, 1.5rem);
   border: 1px solid var(--border);
@@ -119,11 +131,14 @@ summary:focus-visible {
 }
 
 .narrow-panel {
+  /* ログインや設定など幅を抑えた画面 */
   width: min(100%, 38rem);
   margin: 2rem auto;
 }
 
+/* タイトル画面 */
 .home-screen {
+  /* タイトル画面の幅・配置・内側余白 */
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -136,6 +151,7 @@ summary:focus-visible {
 }
 
 .home-screen::before {
+  /* タイトル画面右上の淡い円形装飾 */
   position: absolute;
   z-index: -1;
   top: -8rem;
@@ -159,12 +175,14 @@ summary:focus-visible {
 }
 
 .home-screen h1 {
+  /* タイトル見出しの横幅と中央配置 */
   max-width: 18ch;
   margin-inline: auto;
   text-wrap: balance;
 }
 
 .eyebrow {
+  /* 見出し上の小さな英字ラベル */
   margin: 0 0 0.8rem;
   color: var(--accent-ruby);
   font-size: 0.75rem;
@@ -179,15 +197,18 @@ summary:focus-visible {
 }
 
 .small {
+  /* 補足用の小さい文字サイズ */
   font-size: 0.84rem;
 }
 
 .home-actions {
+  /* タイトル画面の開始・再開ボタン位置 */
   justify-content: center;
   margin: 2rem 0;
 }
 
 .button {
+  /* ボタンの高さ・内側余白・角丸 */
   min-height: 2.75rem;
   padding: 0.65rem 1rem;
   border: 1px solid var(--border-strong);
@@ -201,18 +222,22 @@ summary:focus-visible {
     transform 120ms ease;
 }
 
+/* 共通ボタンの色・サイズ・ホバー・フォーカス */
 .button:hover:not(:disabled) {
+  /* ボタンにマウスを乗せたときの色と移動量 */
   border-color: var(--accent-ruby);
   background: var(--button-hover);
   transform: translateY(-1px);
 }
 
 .button:disabled {
+  /* 使用できないボタンの薄さ */
   cursor: not-allowed;
   opacity: 0.48;
 }
 
 .button--primary {
+  /* 強調ボタンの配色 */
   border-color: var(--accent-pink);
   color: var(--text-color);
   background: var(--accent-pink);
@@ -225,107 +250,28 @@ summary:focus-visible {
 }
 
 .button--quiet {
+  /* 控えめなボタンの配色 */
   color: var(--text-muted);
   background: transparent;
 }
 
 .top-nav .button {
+  /* ヘッダーナビ内だけボタンを小さくする */
   min-height: 2.35rem;
   padding: 0.45rem 0.7rem;
   font-size: 0.88rem;
 }
 
 .stack {
+  /* 縦並び要素の間隔 */
   display: grid;
   gap: 0.75rem;
   margin: 1.5rem 0;
 }
 
-.game-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 17rem;
-  align-items: start;
-  gap: 1rem;
-}
-
-.scene {
-  position: relative;
-  min-height: 31rem;
-  overflow: hidden;
-  padding: 1rem;
-  background: var(--scene-base);
-}
-
-.scene-background {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(160deg, var(--scene-mid) 0%, var(--scene-base) 48%, var(--scene-cool) 100%);
-}
-
-.scene-background-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.scene-silhouette {
-  position: absolute;
-  z-index: 1;
-  right: 12%;
-  bottom: 8.5rem;
-  max-width: min(40%, 18rem);
-  max-height: 65%;
-  object-fit: contain;
-  object-position: bottom;
-  pointer-events: none;
-}
-
-.scene-heading,
-.scene-status,
+/* 会話ウィンドウと話者名 */
 .dialogue-window {
-  position: relative;
-  z-index: 1;
-}
-
-.scene-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.7rem;
-  color: var(--bg-main);
-  background: var(--scene-overlay);
-}
-
-.scene-heading h1 {
-  margin: 0;
-  font-size: 1.15rem;
-}
-
-.scene-status {
-  position: absolute;
-  top: 4.7rem;
-  left: 1.75rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  max-width: calc(100% - 3.5rem);
-  color: var(--bg-main);
-}
-
-.scene-status span {
-  padding: 0.4rem 0.6rem;
-  border: 1px solid var(--scene-border);
-  border-radius: 999px;
-  background: var(--scene-overlay-soft);
-  font-size: 0.86rem;
-}
-
-.dialogue-window {
+  /* 旧レイアウトの会話欄の位置・最低高さ・余白 */
   position: absolute;
   right: 1rem;
   bottom: 1rem;
@@ -340,6 +286,7 @@ summary:focus-visible {
 }
 
 .dialogue-window--fullscreen {
+  /* 旧レイアウトで本文を広く表示するモード */
   inset: 4.5rem 1.5rem 1.5rem;
   min-height: 0;
   display: flex;
@@ -371,6 +318,7 @@ summary:focus-visible {
 }
 
 .speaker {
+  /* 話者名ラベルの色・余白 */
   display: inline-block;
   margin: -1.65rem 0 0.4rem;
   padding: 0.3rem 0.8rem;
@@ -385,12 +333,14 @@ summary:focus-visible {
 }
 
 .dialogue-window > p {
+  /* 会話本文の行間と段落間隔 */
   min-height: 2rem;
   margin: 0.25rem 0 0.8rem;
   line-height: 1.7;
 }
 
 .dialogue-hint {
+  /* 次へ進むなどの操作ヒント */
   display: block;
   margin: 0.4rem 0;
   font-size: 0.78rem;
@@ -402,54 +352,14 @@ summary:focus-visible {
 }
 
 .choice-list {
+  /* シナリオ分岐の選択肢ボタン配置 */
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
-.sidebar {
-  display: grid;
-  gap: 1rem;
-}
-
-.compact-panel {
-  padding: 1rem;
-}
-
-.compact-panel h2,
-.section-heading h2 {
-  margin-top: 0;
-}
-
-.meter-label {
-  display: block;
-  margin-bottom: 0.3rem;
-}
-
-progress {
-  width: 100%;
-  height: 0.9rem;
-  accent-color: var(--accent-pink);
-}
-
-.compact-panel > p {
-  margin-top: 0.25rem;
-  text-align: right;
-  font-size: 0.85rem;
-}
-
-.details-panel {
-  margin-top: 1rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid var(--border);
-}
-
-.details-panel summary {
-  cursor: pointer;
-  font-weight: 700;
-}
-
 .detail-grid {
+  /* 詳細ステータスの項目名・値の2列配置 */
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 0.5rem 0.75rem;
@@ -466,22 +376,11 @@ progress {
   text-align: right;
 }
 
-.action-panel {
-  margin-top: 1rem;
-}
-
-.section-heading {
-  margin-bottom: 1rem;
-}
-
-.section-heading h2,
-.section-heading p {
-  margin-bottom: 0.3rem;
-}
-
+/* 行動カード、セーブ枠、エンディング一覧 */
 .action-grid,
 .slot-grid,
 .ending-grid {
+  /* 行動・セーブ枠・エンディングカードの列数と隙間 */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   gap: 0.75rem;
@@ -490,13 +389,13 @@ progress {
 .action-card,
 .slot-card,
 .ending-card {
+  /* 各種カードの内側余白・枠線・背景色 */
   padding: 1rem;
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   background: var(--surface-raised);
 }
 
-.action-card h3,
 .slot-card h2,
 .ending-card h2 {
   margin: 0 0 0.5rem;
@@ -514,11 +413,8 @@ progress {
   width: 100%;
 }
 
-.action-panel > .toolbar {
-  margin-top: 1rem;
-}
-
 .stage-confirm {
+  /* ステージ移行確認ダイアログの画面中央配置 */
   position: fixed;
   z-index: 5;
   inset: 50% auto auto 50%;
@@ -532,8 +428,10 @@ progress {
   margin-top: 0;
 }
 
+/* セーブ・ロード・エンディング・各種メッセージ */
 .slot-grid,
 .ending-grid {
+  /* セーブ枠・エンディング一覧の上下余白 */
   margin: 1.5rem 0;
 }
 
@@ -567,6 +465,7 @@ progress {
 
 .account-panel,
 .import-save-panel {
+  /* アカウント・セーブデータ読み込み欄 */
   margin: 1rem 0;
   padding: 1rem;
   border: 1px solid var(--border);
@@ -585,6 +484,7 @@ progress {
 }
 
 .result-screen {
+  /* エンディング結果画面の最大幅と中央配置 */
   width: min(100%, 52rem);
   margin: 2rem auto;
 }
@@ -601,6 +501,7 @@ progress {
 }
 
 .notice {
+  /* 通知メッセージの余白・枠線・背景 */
   margin: 0.75rem 0 0;
   padding: 0.8rem 1rem;
   border: 1px solid var(--border);
@@ -614,11 +515,13 @@ progress {
 }
 
 .footer {
+  /* ページ最下部のフッター表示 */
   padding: 0.8rem 0 1.2rem;
   font-size: 0.78rem;
   text-align: center;
 }
 
+/* 読み込み中・エラー画面 */
 .boot-message {
   width: min(100% - 2rem, 40rem);
   margin: 20vh auto;
@@ -653,7 +556,9 @@ progress {
 }
 
 @media (max-width: 760px) {
+  /* 共通レイアウトのタブレット・スマートフォン調整 */
   .topbar {
+    /* 狭い画面ではヘッダー内を縦に並べる */
     align-items: flex-start;
     flex-direction: column;
   }
@@ -662,58 +567,13 @@ progress {
     width: 100%;
   }
 
-  .game-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-  }
-
-  .scene {
-    min-height: 34rem;
-  }
-
-  .scene-silhouette {
-    right: 8%;
-    bottom: 10rem;
-    max-width: 48%;
-    max-height: 55%;
-  }
-
-  .dialogue-window {
-    right: 0.6rem;
-    bottom: 0.6rem;
-    left: 0.6rem;
-    padding: 0.85rem;
-  }
-
-  .dialogue-window--fullscreen {
-    inset: 4.5rem 0.6rem 0.6rem;
-    padding: 1rem;
-    font-size: 1.05rem;
-  }
 }
 
 @media (max-width: 420px) {
+  /* 共通レイアウトの小型スマートフォン調整 */
   .app-shell {
+    /* 画面端の左右余白 */
     width: min(100% - 1rem, 76rem);
-  }
-
-  .scene {
-    min-height: 36rem;
-    padding: 0.6rem;
-  }
-
-  .scene-heading {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-
-  .scene-status {
-    top: 5.2rem;
-    left: 1rem;
   }
 
   .home-actions > .button {
@@ -735,6 +595,8 @@ progress {
   }
 }
 
+/* 以下はサウンドノベル画面専用の色とレイアウト上書き。
+   同じセレクターの前の指定よりこちらが優先されます。 */
 :root {
   --scene-dawn: #F0BEC9;
   --scene-evening: #D99AAE;
@@ -747,18 +609,21 @@ progress {
 }
 
 .app-shell--game {
+  /* ゲーム中は通常の最大幅制限を外して全画面表示 */
   width: 100%;
   min-height: 100svh;
   margin: 0;
 }
 
 .app-shell--game .page-content {
+  /* ゲーム中のコンテンツ余白をなくして画面いっぱいにする */
   display: flex;
   min-height: 100svh;
   padding: 0;
 }
 
 .app-shell--game .notice {
+  /* ゲーム中の通知を画面上部中央に重ねる */
   position: absolute;
   z-index: 8;
   top: 0.75rem;
@@ -767,6 +632,7 @@ progress {
   transform: translateX(-50%);
 }
 
+/* サウンドノベルの全画面ステージと背景。背景色・高さを調整 */
 .game-screen,
 .scene {
   width: 100%;
@@ -774,6 +640,7 @@ progress {
 }
 
 .scene {
+  /* ゲーム中の背景領域をビューポート全面に広げる */
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -785,6 +652,7 @@ progress {
 }
 
 .scene-background {
+  /* 背景レイヤーの重なり順と既定の配色 */
   position: absolute;
   z-index: -1;
   inset: 0;
@@ -794,24 +662,28 @@ progress {
 }
 
 .scene-background--studio-dusk {
+  /* 夕方シーンの背景色 */
   background:
     radial-gradient(ellipse at 72% 24%, var(--scene-evening), transparent 42%),
     linear-gradient(165deg, var(--scene-evening), var(--scene-base) 58%, var(--scene-cool));
 }
 
 .scene-background--studio-morning {
+  /* 朝シーンの背景色 */
   background:
     radial-gradient(ellipse at 66% 20%, var(--scene-dawn), transparent 48%),
     linear-gradient(165deg, var(--scene-dawn), var(--scene-mid) 60%, var(--scene-cool));
 }
 
 .scene-background--studio-night {
+  /* 夜シーンの背景色 */
   background:
     radial-gradient(ellipse at 78% 18%, var(--scene-night), transparent 46%),
     linear-gradient(160deg, var(--scene-night), var(--scene-base) 68%);
 }
 
 .scene-background-image {
+  /* 実画像を背景全体に表示。切れ方は object-fit で調整 */
   position: absolute;
   inset: 0;
   width: 100%;
@@ -819,18 +691,22 @@ progress {
   object-fit: cover;
 }
 
+/* 画面上部のステージ名・パラメータ・メニュー操作 */
 .scene-heading,
 .scene-controls {
+  /* ステージ名とメニューを画面上部に固定 */
   position: absolute;
   z-index: 3;
   top: clamp(1rem, 3vw, 2.5rem);
 }
 
 .scene-heading {
+  /* ステージ名ブロックの左位置・内側余白 */
   left: clamp(1rem, 4vw, 3.5rem);
   display: grid;
   gap: 0.2rem;
   padding: 0.7rem 1rem;
+  border-radius: 0.7rem;
   border-left: 2px solid var(--accent-pink);
   color: var(--bg-main);
   background: var(--scene-overlay-soft);
@@ -838,6 +714,7 @@ progress {
 }
 
 .scene-heading span {
+  /* ステージ名上の小さなラベル */
   color: var(--accent-pink);
   font-size: 0.75rem;
   font-weight: 700;
@@ -845,12 +722,14 @@ progress {
 }
 
 .scene-heading h1 {
+  /* ステージ名の文字サイズ */
   margin: 0;
   font-size: clamp(0.9rem, 1.8vw, 1.25rem);
   font-weight: 500;
 }
 
 .scene-parameters {
+  /* 小型パラメータ表示の位置・幅・列数 */
   position: absolute;
   z-index: 3;
   top: 6.25rem;
@@ -868,11 +747,13 @@ progress {
 }
 
 .scene-parameter {
+  /* 各ゲージ項目の文字サイズ */
   min-width: 0;
   font-size: 0.72rem;
 }
 
 .scene-parameter > div {
+  /* パラメータ名と数値を左右に配置 */
   display: flex;
   justify-content: space-between;
   gap: 0.4rem;
@@ -884,6 +765,7 @@ progress {
 }
 
 .scene-parameter meter {
+  /* スタミナ・好感度ゲージの太さと色 */
   display: block;
   width: 100%;
   height: 0.35rem;
@@ -891,6 +773,7 @@ progress {
 }
 
 .scene-parameter--count {
+  /* 登録者数を2列分使って横一列に表示 */
   grid-column: 1 / -1;
   display: flex;
   justify-content: space-between;
@@ -898,6 +781,7 @@ progress {
 }
 
 .scene-controls {
+  /* メニューボタン群の右位置と折り返し */
   right: clamp(1rem, 4vw, 3.5rem);
   display: flex;
   flex-wrap: wrap;
@@ -906,6 +790,7 @@ progress {
 }
 
 .scene-controls .button {
+  /* 背景上で読みやすいメニューボタンの配色 */
   min-height: 2.4rem;
   border-color: var(--scene-border);
   color: var(--bg-main);
@@ -913,10 +798,12 @@ progress {
 }
 
 .scene-controls .button:hover:not(:disabled) {
+  /* メニューボタンのホバー色 */
   border-color: var(--accent-pink);
   background: var(--scene-overlay);
 }
 
+/* 人物シルエット。表示位置・大きさ・明るさ・不透明度を調整 */
 .scene-silhouette {
   position: absolute;
   z-index: 0;
@@ -924,12 +811,15 @@ progress {
   left: var(--silhouette-left, 58%);
   width: var(--silhouette-width, 34%);
   height: min(68%, 42rem);
+  max-width: min(40%, 18rem);
+  max-height: 65%;
   filter: brightness(var(--silhouette-brightness, 0.55)) contrast(1.1);
   opacity: var(--silhouette-opacity, 0.62);
   pointer-events: none;
 }
 
 .scene-silhouette img {
+  /* シルエット画像を縦横比を保って下端に合わせる */
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -937,6 +827,7 @@ progress {
 }
 
 .scene-silhouette--placeholder .silhouette-placeholder-shape {
+  /* 素材未設定時に表示するCSS製の仮シルエット形状 */
   position: absolute;
   inset: 0;
   background:
@@ -946,6 +837,7 @@ progress {
   clip-path: polygon(39% 28%, 31% 32%, 23% 46%, 12% 66%, 13% 100%, 87% 100%, 88% 66%, 77% 46%, 69% 32%, 61% 28%);
 }
 
+/* 画面下部の本文ウィンドウ。位置・幅・高さ・文字サイズを調整 */
 .dialogue-window {
   position: absolute;
   z-index: 2;
@@ -965,6 +857,7 @@ progress {
 }
 
 .dialogue-window > p {
+  /* 本文の文字サイズ・行間。長文は改行を維持 */
   margin: 0.45rem 0 0.75rem;
   font-size: clamp(1rem, 2vw, 1.3rem);
   line-height: 1.9;
@@ -972,6 +865,7 @@ progress {
 }
 
 .dialogue-window .speaker {
+  /* サウンドノベル画面の話者名表示 */
   margin: 0;
   padding: 0.3rem 0.75rem;
   border: 0;
@@ -981,9 +875,11 @@ progress {
 }
 
 .dialogue-window .dialogue-hint {
+  /* 文章送りの操作案内の文字色 */
   color: var(--text-muted);
 }
 
+/* 会話ウィンドウ内の操作ボタン・選択肢 */
 .dialogue-controls,
 .choice-list {
   display: flex;
@@ -993,18 +889,21 @@ progress {
 }
 
 .scene-action-panel {
+  /* 本文ウィンドウ内の行動選択エリアとの区切り */
   margin-top: 0.85rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border);
 }
 
 .scene-action-hint {
+  /* 行動プレビューの操作説明 */
   margin: 0 0 0.55rem;
   color: var(--text-muted);
   font-size: 0.78rem;
 }
 
 .scene-action-grid {
+  /* 行動ボタンの列幅とボタン間隔 */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
   gap: 0.5rem;
@@ -1015,12 +914,14 @@ progress {
 }
 
 .scene-action-choice > .button {
+  /* 行動ボタンの横幅と最低高さ */
   width: 100%;
   min-height: 2.6rem;
   white-space: normal;
 }
 
 .scene-action-preview {
+  /* ホバー・フォーカス時に行動ボタンの上へ出る説明欄 */
   display: none;
   margin-bottom: 0.35rem;
   padding: 0.5rem 0.65rem;
@@ -1035,15 +936,18 @@ progress {
 }
 
 .scene-action-preview p + p {
+  /* 説明の下に表示する数値変化を強調 */
   margin-top: 0.3rem;
   font-weight: 600;
 }
 
 .scene-action-choice:hover .scene-action-preview,
 .scene-action-choice:focus-within .scene-action-preview {
+  /* マウス操作・キーボード操作のどちらでも説明を表示 */
   display: block;
 }
 
+/* 全文表示モードの本文ウィンドウ */
 .dialogue-window .button {
   color: var(--text-color);
 }
@@ -1061,6 +965,7 @@ progress {
 }
 
 .dialogue-window--fullscreen {
+  /* 全文表示時のウィンドウ位置・幅・本文配置 */
   inset: clamp(5rem, 12vh, 8rem) clamp(1rem, 6vw, 6rem);
   display: flex;
   flex-direction: column;
@@ -1071,6 +976,7 @@ progress {
 }
 
 .dialogue-window--fullscreen > p {
+  /* 全文表示本文の最大幅・文字サイズ・行間 */
   width: min(100%, 62rem);
   margin: 0.75rem auto;
   font-size: clamp(1.2rem, 2.5vw, 1.7rem);
@@ -1078,6 +984,7 @@ progress {
 }
 
 .stage-confirm {
+  /* ステージ移行確認の最前面レイヤーと暗幕 */
   position: fixed;
   z-index: 6;
   inset: 50% auto auto 50%;
@@ -1091,7 +998,9 @@ progress {
   margin-top: 0;
 }
 
+/* CSSプレースホルダー背景の窓と床の演出 */
 .scene-background::before {
+  /* 仮背景の窓。位置・サイズ・窓枠と空の色を調整 */
   position: absolute;
   top: 12%;
   right: 11%;
@@ -1109,6 +1018,7 @@ progress {
 }
 
 .scene-background::after {
+  /* 仮背景の下部に重ねる床の影 */
   position: absolute;
   right: 0;
   bottom: 0;
@@ -1118,7 +1028,9 @@ progress {
   content: "";
 }
 
+/* 専用の行動選択画面・ステータス画面・バックログ */
 .selection-screen {
+  /* 行動選択・ステータスなど専用画面の最大幅 */
   width: min(100%, 72rem);
   margin: 0 auto;
 }
@@ -1135,6 +1047,7 @@ progress {
 }
 
 .action-facts {
+  /* 行動の所要時間・消費量などのラベルと値の列幅 */
   display: grid;
   grid-template-columns: minmax(7rem, auto) 1fr;
   gap: 0.45rem 0.7rem;
@@ -1156,12 +1069,14 @@ progress {
 }
 
 .status-grid {
+  /* ステータス画面の項目名・値の列幅 */
   max-width: 46rem;
   grid-template-columns: minmax(9rem, auto) 1fr;
   margin: 1.5rem 0;
 }
 
 .backlog-list {
+  /* バックログの縦間隔と一覧の最大高さ */
   display: grid;
   gap: 0.5rem;
   max-height: 65vh;
@@ -1171,6 +1086,7 @@ progress {
 }
 
 .backlog-list li {
+  /* ログ1件ごとの左線と背景 */
   padding: 0.8rem 1rem;
   border-left: 2px solid var(--accent-pink);
   background: var(--surface-raised);
@@ -1183,11 +1099,14 @@ progress {
 }
 
 @media (max-width: 760px) {
+  /* サウンドノベル画面のタブレット・スマートフォン調整 */
   .scene {
+    /* モバイルではステージを最低でも画面高にする */
     min-height: 100svh;
   }
 
   .scene-background::before {
+    /* 小画面で仮背景の窓を広げる */
     top: 12%;
     right: 7%;
     width: min(78%, 34rem);
@@ -1195,12 +1114,14 @@ progress {
   }
 
   .scene-heading {
+    /* ステージ名ブロックのモバイル位置・余白 */
     top: 0.75rem;
     left: 0.75rem;
     padding: 0.5rem 0.65rem;
   }
 
   .scene-parameters {
+    /* パラメータ欄を左上へ詰めて小型化 */
     top: 4.7rem;
     left: 0.75rem;
     width: min(16rem, calc(100% - 1.5rem));
@@ -1208,6 +1129,7 @@ progress {
   }
 
   .scene-controls {
+    /* メニューを右上にまとめて横幅を制限 */
     top: 0.75rem;
     right: 0.75rem;
     max-width: 58%;
@@ -1215,12 +1137,14 @@ progress {
   }
 
   .scene-controls .button {
+    /* モバイルのメニューボタンを小さくする */
     min-height: 2.2rem;
     padding: 0.4rem 0.55rem;
     font-size: 0.8rem;
   }
 
   .dialogue-window {
+    /* 下端の安全領域を避ける本文欄位置・最大高さ */
     right: 0.6rem;
     bottom: max(0.6rem, env(safe-area-inset-bottom));
     left: 0.6rem;
@@ -1229,18 +1153,22 @@ progress {
   }
 
   .dialogue-window--fullscreen {
+    /* モバイル全文表示の上下左右余白 */
     inset: 4.5rem 0.6rem 0.6rem;
     max-height: none;
   }
 
   .dialogue-controls > .button,
   .choice-list > .button {
+    /* スマートフォンの操作ボタンを折り返して広げる */
     flex: 1 1 10rem;
   }
 }
 
 @media (max-width: 420px) {
+  /* サウンドノベル画面の小型スマートフォン調整 */
   .scene-heading h1 {
+    /* 長いステージ名を省略してメニューと重ならないようにする */
     max-width: 9rem;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1248,6 +1176,7 @@ progress {
   }
 
   .scene-parameters {
+    /* 最小画面幅ではゲージを1列表示 */
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -1256,10 +1185,12 @@ progress {
   }
 
   .scene-controls {
+    /* 小型端末ではメニュー群の横幅をさらに制限 */
     max-width: 62%;
   }
 
   .scene-controls .button {
+    /* 小型端末用のボタン高さ・余白・文字サイズ */
     min-height: 2rem;
     padding: 0.3rem 0.4rem;
     font-size: 0.74rem;
