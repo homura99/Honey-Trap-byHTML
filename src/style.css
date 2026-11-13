@@ -850,6 +850,53 @@ progress {
   font-weight: 500;
 }
 
+.scene-parameters {
+  position: absolute;
+  z-index: 3;
+  top: 6.25rem;
+  left: clamp(1rem, 4vw, 3.5rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem 0.7rem;
+  width: min(20rem, calc(100% - 2rem));
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--scene-border);
+  border-radius: 0.55rem;
+  color: var(--bg-main);
+  background: var(--scene-overlay-soft);
+  pointer-events: none;
+}
+
+.scene-parameter {
+  min-width: 0;
+  font-size: 0.72rem;
+}
+
+.scene-parameter > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.scene-parameter strong {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.scene-parameter meter {
+  display: block;
+  width: 100%;
+  height: 0.35rem;
+  accent-color: var(--accent-pink);
+}
+
+.scene-parameter--count {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
 .scene-controls {
   right: clamp(1rem, 4vw, 3.5rem);
   display: flex;
@@ -943,6 +990,58 @@ progress {
   flex-wrap: wrap;
   gap: 0.55rem;
   margin-top: 0.7rem;
+}
+
+.scene-action-panel {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.scene-action-hint {
+  margin: 0 0 0.55rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.scene-action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: 0.5rem;
+}
+
+.scene-action-choice {
+  min-width: 0;
+}
+
+.scene-action-choice > .button {
+  width: 100%;
+  min-height: 2.6rem;
+  white-space: normal;
+}
+
+.scene-action-preview {
+  display: none;
+  margin-top: 0.35rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--window-bg);
+  font-size: 0.78rem;
+}
+
+.scene-action-preview p {
+  margin: 0;
+}
+
+.scene-action-preview p + p {
+  margin-top: 0.3rem;
+  font-weight: 600;
+}
+
+.scene-action-choice:hover .scene-action-preview,
+.scene-action-choice:focus-within .scene-action-preview {
+  display: block;
 }
 
 .dialogue-window .button {
@@ -1101,6 +1200,13 @@ progress {
     padding: 0.5rem 0.65rem;
   }
 
+  .scene-parameters {
+    top: 4.7rem;
+    left: 0.75rem;
+    width: min(16rem, calc(100% - 1.5rem));
+    padding: 0.45rem 0.55rem;
+  }
+
   .scene-controls {
     top: 0.75rem;
     right: 0.75rem;
@@ -1139,6 +1245,14 @@ progress {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .scene-parameters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .scene-parameter--count {
+    grid-column: auto;
   }
 
   .scene-controls {

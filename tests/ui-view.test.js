@@ -22,6 +22,8 @@ const baseView = {
   time: { period: "朝", time: "08:00", date: "2025-04-01" },
   displayStamina: 100,
   maxStamina: 100,
+  affectionMin: 0,
+  affectionMax: 100,
   affection: 10,
   subscribers: 1,
   difficultyLabel: "甘口",
@@ -30,6 +32,7 @@ const baseView = {
   pendingEventCount: 0,
   stageTransitionPending: false,
   canPerformActions: false,
+  actionsPanelOpen: false,
   actions: [],
   backlog: [],
   autoPlayEnabled: false,
@@ -132,7 +135,7 @@ test("supports unnamed narration and optional local background and silhouette as
   assert.doesNotMatch(html, /キャラクター画像/);
 });
 
-test("renders a background-first novel screen with controls and no persistent status or action panels", () => {
+test("renders compact stage parameters while keeping action choices closed during dialogue", () => {
   const html = renderApp({
     ...baseView,
     screen: "game",
@@ -150,9 +153,14 @@ test("renders a background-first novel screen with controls and no persistent st
   assert.match(html, /class="scene" aria-label="サウンドノベル画面"/);
   assert.match(html, /data-action="backlog"/);
   assert.match(html, /data-action="menu"/);
+  assert.match(html, /class="scene-parameters" aria-label="現在のパラメータ"/);
+  assert.match(html, /aria-label="スタミナ"/);
+  assert.match(html, /aria-label="好感度"/);
+  assert.match(html, /登録者数/);
+  assert.doesNotMatch(html, /scene-action-panel/);
   assert.doesNotMatch(html, /仮イベント解放/);
   assert.match(html, /物語の文章です。/);
-  assert.doesNotMatch(html, /scene-status|sidebar|action-panel|スタミナ 100/);
+  assert.doesNotMatch(html, /scene-status|sidebar/);
 });
 
 test("keeps the development-only sample event control in the auxiliary menu", () => {
@@ -187,6 +195,31 @@ test("renders a dedicated action menu with engine previews and an on-demand stat
   assert.match(actionHtml, /実行可能/);
   assert.match(statusHtml, /現在時刻/);
   assert.match(statusHtml, /登録者数/);
+});
+
+test("renders in-game action choices with engine-derived changes on hover or focus", () => {
+  const html = renderApp({
+    ...baseView,
+    screen: "game",
+    engine: {},
+    canPerformActions: true,
+    actionsPanelOpen: true,
+    actions: [{
+      id: "conversation",
+      label: "会話",
+      description: "わなと話す。",
+      timeCostMinutes: 30,
+      preview: {
+        timeCostMinutes: 30,
+        staminaCost: 5,
+        parameterChanges: { affection: 2, stamina: -5, subscribers: 0 },
+      },
+    }],
+  });
+
+  assert.match(html, /class="scene-action-panel" aria-label="行動選択肢"/);
+  assert.match(html, /data-action="perform-action" data-value="conversation"/);
+  assert.match(html, /好感度 \+2 \/ スタミナ -5/);
 });
 
 test("supports multiple CSS silhouette placeholders with bounded layout values", () => {

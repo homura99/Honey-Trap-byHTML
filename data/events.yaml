@@ -1,5 +1,5 @@
 version: 1
-status: development-sample
+status: development-draft
 events:
   - id: sample-arrival
     stageId: stage-01
@@ -19,15 +19,45 @@ events:
           value: true
     dialogue:
       - speaker: "天依わな"
-        text: "これはデータ形式確認用の仮イベントです。"
-        scene: studio-dusk
+        text: "素材表示テスト：放課後の校舎。背景と透過シルエットの配置を確認します。"
+        backgroundImage: /images/backgrounds/school_corridor_day.jpg
         silhouettes:
-          - placeholder: true
-            left: 62
-            bottom: 8
+          - image: /images/silhouettes/wanna_normal.png
+            left: 63
+            bottom: 0
+            width: 31
+            opacity: 75
+            brightness: 42
+      - speaker: "ナレーション"
+        text: "素材表示テスト：花壇のそばに並ぶベンチ。"
+        backgroundImage: /images/backgrounds/school_bench_day.jpg
+        silhouettes:
+          - image: /images/silhouettes/wanna_smile.png
+            left: 64
+            bottom: 0
             width: 30
-            opacity: 76
-            brightness: 34
+            opacity: 75
+            brightness: 42
+      - speaker: "ナレーション"
+        text: "素材表示テスト：青空の下の街角。"
+        backgroundImage: /images/backgrounds/town_traffic_day_blue.jpg
+        silhouettes:
+          - image: /images/silhouettes/wanna_scare.png
+            left: 64
+            bottom: 0
+            width: 30
+            opacity: 75
+            brightness: 42
+      - speaker: "ナレーション"
+        text: "素材表示テスト：明るいコンビニの店内。"
+        backgroundImage: /images/backgrounds/conveni_inner.jpg
+        silhouettes:
+          - image: /images/silhouettes/wanna_jito.png
+            left: 64
+            bottom: 0
+            width: 30
+            opacity: 75
+            brightness: 42
     choices:
       - id: continue
         text: "確認する"
@@ -72,10 +102,590 @@ events:
           value: true
     dialogue:
       - speaker: "ナレーション"
-        text: "分岐先IDの参照を検証するための仮イベントです。"
-        scene: studio-night
+        text: "素材表示テスト：表情差分の透過表示を確認します。"
+        backgroundImage: /images/backgrounds/conveni_inner.jpg
+        silhouettes:
+          - image: /images/silhouettes/wanna_happy_tear.png
+            left: 64
+            bottom: 0
+            width: 30
+            opacity: 75
+            brightness: 42
     choices: []
     relatedEndingIds:
       - abandonment
     deferPolicy:
       enabled: false
+
+  - id: draft-week-01
+    stageId: stage-01
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "春。わなは「一年かけて、自分らしい配信を見つける」と宣言した。あなたは、その挑戦をそばで支えることにする。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-02
+    stageId: stage-02
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "まずは配信の名前からね。覚えやすくて、わならしいやつ！" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-03
+    stageId: stage-03
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "配信の企画メモが机に広がる。雑談、ゲーム、歌――わなはどれにも丸をつけて、まだ決めきれずにいた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-04
+    stageId: stage-04
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "マイクの音、ちゃんと届いてる？ ……よし。最初の一歩くらい、完璧じゃなくてもいいよね。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-05
+    stageId: stage-05
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "初めての配信。始まる前は強気だったわなも、配信開始の表示を前に一度だけ深呼吸した。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-06
+    stageId: stage-06
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "視聴者はまだ少ない。それでも、画面の向こうに誰かがいると思うと、わなの声に少し熱がこもった。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-07
+    stageId: stage-07
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "コメント来てる！ ……えへへ、また来てくれるといいな。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-08
+    stageId: stage-08
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "配信後、わなは反省点をノートに書き出す。あなたのメモと見比べるうち、二人の準備にも少しずつ呼吸が生まれていた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-09
+    stageId: stage-09
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "短い切り抜き動画を試しに公開した。小さな反応が返ってきて、わなは何度も再生数を確かめた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-10
+    stageId: stage-10
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "次は、見てる人も一緒に参加できる企画にしよ。みんなの声も聞いてみたいし！" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-11
+    stageId: stage-11
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "新しい企画は思ったより準備が大変だった。わなは焦りを隠して笑うが、あなたには疲れが見えていた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-12
+    stageId: stage-12
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "初めての企画配信は、予定どおりには進まなかった。けれど最後まで見てくれた人の言葉が、わなの表情をやわらげた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-13
+    stageId: stage-13
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "いつもの人がまた来てくれた。こういうのって、数字よりずっと嬉しいかも。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-14
+    stageId: stage-14
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "季節が変わり、配信の予定も整ってきた。わなは「無理なく続ける日」をカレンダーに書き足す。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-15
+    stageId: stage-15
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "新しいゲーム配信に挑戦する。勝敗に一喜一憂するわなの素直さが、画面越しにも伝わっていった。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-16
+    stageId: stage-16
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "負けたところまで切り抜かれてる！？ もー、そこだけ見るの禁止！ ……でも、笑ってくれたならいっか。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-17
+    stageId: stage-17
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "配信仲間からコラボの誘いが届いた。わなは嬉しそうにしながら、相手に失礼のない準備を何度も確かめた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-18
+    stageId: stage-18
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "コラボ配信は賑やかに終わった。自分一人では出てこなかった話題に、わなは新しい可能性を見つける。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-19
+    stageId: stage-19
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "楽しい時間のあと、わなは自分の配信と他人の配信を比べてしまう。あなたは、彼女が積み重ねたものを一緒に振り返った。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-20
+    stageId: stage-20
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "誰かの真似じゃなくて、わなの配信を好きって言ってもらいたい。だから、もうちょっと考えてみる。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-21
+    stageId: stage-21
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "秋の企画に向けて、わなは視聴者からお題を募る。届いた案を読み上げる声は、いつもより弾んでいた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-22
+    stageId: stage-22
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "募集したお題を整理すると、意外な共通点が見えてきた。見ている人たちも、それぞれの場所から配信を作っている。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-23
+    stageId: stage-23
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "お題、ちゃんと全部見てるよ。採用されなかった案も、送ってくれた気持ちは嬉しいからね。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-24
+    stageId: stage-24
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "企画の準備中、機材の調子が悪くなる。予定を組み直す二人の会話には、以前より落ち着きがあった。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-25
+    stageId: stage-25
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "秋の企画配信。コメント欄のアイデアが次々と形になり、わなの笑い声がいつまでも途切れなかった。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-26
+    stageId: stage-26
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "この企画、わな一人じゃ作れなかったね。手伝ってくれてありがと。……べ、別に照れてないし！" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-27
+    stageId: stage-27
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "順調に見えた活動に、心ない言葉が混じり始めた。わなは平気なふりをするが、配信後の沈黙が長くなる。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-28
+    stageId: stage-28
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "あなたは、無理に明るく振る舞わなくていいと伝える。わなは返事をせず、温かい飲み物を両手で包んだ。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-29
+    stageId: stage-29
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "今日は少し休ませて。次に何をするかは、元気になってから決めたい。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-30
+    stageId: stage-30
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "配信を休んだ夜、わなはこれまでのアーカイブを見返した。楽しそうな自分の声に、ほんの少し安心する。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-31
+    stageId: stage-31
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "短い近況配信で、わなは休んでいた理由を自分の言葉で話した。画面の向こうから、急かさない返事が届く。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-32
+    stageId: stage-32
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "待っててくれてありがと。ここからは、わなのペースでまた始めるね。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-33
+    stageId: stage-33
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "活動を再開したわなは、予定を詰め込みすぎないよう一週間の配信数を見直した。休むことも計画の一部になった。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-34
+    stageId: stage-34
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "久しぶりのコラボ。わなは相手の話をよく聞き、自分の調子に合わせて会話を楽しんだ。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-35
+    stageId: stage-35
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "前より、配信のあとにちゃんと眠れるようになった。これって結構すごい進歩じゃない？" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-36
+    stageId: stage-36
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "年末の配信で、わなは一年の出来事を振り返る。失敗も休んだ日も、今の自分につながっていた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-37
+    stageId: stage-37
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "新しい年。わなは大きな目標より、続けたい小さな習慣を三つノートに書いた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-38
+    stageId: stage-38
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "今年は新しいことも試す。でも、楽しくないのに無理して続けるのはナシね。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-39
+    stageId: stage-39
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "視聴者参加の新企画を試す。準備には手間がかかったが、わなは配信中ずっと画面の向こうに話しかけていた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-40
+    stageId: stage-40
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "企画のあとに届いた感想を、わなは一つずつ読んだ。数字では測れない手応えが、少しずつ輪郭を持つ。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-41
+    stageId: stage-41
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "一周年の配信、何をしようかな。派手なのもいいけど、みんなとゆっくり話すのも捨てがたいなあ。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-42
+    stageId: stage-42
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "記念配信の準備が始まる。わなは過去の配信から好きな場面を選び、一本の振り返り映像にまとめた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-43
+    stageId: stage-43
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "映像を見返すと、最初のぎこちない挨拶が目に入った。わなは照れくさそうに笑い、ここまで来た時間を数える。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-44
+    stageId: stage-44
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "記念配信の日が近づき、予定外のトラブルも起きた。今度のわなは慌てず、一つずつ解決策を探していく。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-45
+    stageId: stage-45
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "準備は大丈夫。あとは当日、いつもどおりわならしく話すだけ！ ……うん、たぶんね。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-46
+    stageId: stage-46
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "記念配信が始まる。画面には懐かしい場面と新しい企画が並び、わなは集まった人たちへ感謝を伝えた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-47
+    stageId: stage-47
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "配信のあと、わなは机に伏せた。疲れた声のすぐあとに、「楽しかった。また次もやろうね」と続ける。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-48
+    stageId: stage-48
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "一年の目標、達成できたかは数字だけじゃ決められないね。わなは、ちゃんと前より自分のことが好きだよ。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-49
+    stageId: stage-49
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "年度末が近づき、わなは次の一年の企画を書き出す。今度のノートには、あなたと相談した案も並んでいた。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-50
+    stageId: stage-50
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "これからの配信で大切にしたいことを、わなは三つ選ぶ。無理をしないこと、楽しむこと、そして人の声を忘れないこと。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-51
+    stageId: stage-51
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "天依わな", text: "最初の配信を覚えてる？ あの頃より少しは成長したけど、緊張するところは変わってないかも。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }
+  - id: draft-week-52
+    stageId: stage-52
+    type: story
+    priority: -100
+    probability: 1
+    repeatPolicy: { mode: once }
+    condition: { all: [{ parameter: affection, operator: gte, value: 0 }] }
+    dialogue: [{ speaker: "ナレーション", text: "一年の最後の配信。わなは次の目標を口にする。配信終了の表示が消えたあとも、二人の物語は続いていく。" }]
+    choices: []
+    relatedEndingIds: []
+    deferPolicy: { enabled: false }

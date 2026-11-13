@@ -77,14 +77,32 @@ test("validates optional dialogue display modes and rejects unsupported values",
 test("validates scenario backgrounds and multiple silhouette presentation data", async () => {
   const validSources = await loadSources();
   const validResult = loadGameData(validSources);
+  const stages = validResult.data["data/stages.yaml"].stages;
+  const weeklyDraftEvents = validResult.data["data/events.yaml"].events.filter(({ id }) =>
+    id.startsWith("draft-week-"),
+  );
 
   assert.deepEqual(validResult.errors, []);
-  assert.equal(validResult.data["data/events.yaml"].events[0].dialogue[0].scene, "studio-dusk");
-  assert.equal(validResult.data["data/events.yaml"].events[0].dialogue[0].silhouettes[0].placeholder, true);
+  assert.equal(
+    validResult.data["data/events.yaml"].events[0].dialogue[0].backgroundImage,
+    "/images/backgrounds/school_corridor_day.jpg",
+  );
+  assert.equal(
+    validResult.data["data/events.yaml"].events[0].dialogue[0].silhouettes[0].image,
+    "/images/silhouettes/wanna_normal.png",
+  );
+  assert.equal(
+    weeklyDraftEvents.length,
+    stages.length,
+  );
+  assert.deepEqual(
+    [...new Set(weeklyDraftEvents.map(({ stageId }) => stageId))].sort(),
+    stages.map(({ id }) => id).sort(),
+  );
 
   const invalidSources = await loadSources();
   invalidSources["data/events.yaml"] = invalidSources["data/events.yaml"]
-    .replace("            opacity: 76", "            opacity: 120");
+    .replace("            opacity: 75", "            opacity: 120");
   const invalidResult = loadGameData(invalidSources);
 
   assert.equal(invalidResult.data, null);

@@ -17,6 +17,23 @@ function button(label, action, options = {}) {
   return `<button class="button${kind}" type="button" data-action="${escapeHtml(action)}"${value}${disabled}>${escapeHtml(label)}</button>`;
 }
 
+function parameterChangeText(preview) {
+  if (!preview) {
+    return "現在は実行できません";
+  }
+  const labels = {
+    affection: "好感度",
+    stamina: "スタミナ",
+    subscribers: "登録者数",
+  };
+  return Object.entries(preview.parameterChanges)
+    .filter(([, amount]) => amount !== 0)
+    .map(([parameter, amount]) =>
+      `${labels[parameter] ?? parameter} ${amount > 0 ? "+" : ""}${amount}`,
+    )
+    .join(" / ") || "状態変化なし";
+}
+
 function navigation(gameActive) {
   return `
     <nav class="top-nav" aria-label="メニュー">
@@ -72,9 +89,14 @@ function dialogue(view) {
         <p>${escapeHtml(view.message?.type === "status" ? view.message.text : "静かな時間が流れている。次の行動を選ぶか、イベントを確認しよう。")}</p>
         <span class="dialogue-hint">行動を選ぶか、発生可能なイベントを確認してください。</span>
         <div class="dialogue-controls">
-          ${button("行動を選ぶ", "actions", { kind: "primary", disabled: !view.canPerformActions })}
+          ${button(
+    view.actionsPanelOpen ? "行動を閉じる" : "行動を選ぶ",
+    "toggle-actions",
+    { kind: "primary", disabled: !view.canPerformActions },
+  )}
           ${button("イベント確認", "check-event")}
         </div>
+        ${view.actionsPanelOpen ? actionChoices(view) : ""}
       </section>
     `;
   }
@@ -122,6 +144,35 @@ function resultText(line) {
   `;
 }
 
+function actionChoices(view) {
+  return `
+    <section class="scene-action-panel" aria-label="行動選択肢">
+      <p class="scene-action-hint">ホバーまたはフォーカスで、実行後の変化を確認できます。</p>
+      <div class="scene-action-grid">
+        ${view.actions.map((action) => {
+    const preview = action.preview;
+    return `
+          <article class="scene-action-choice">
+            ${button(
+    `${action.label} ・ ${preview?.timeCostMinutes ?? action.timeCostMinutes}分`,
+    "perform-action",
+    {
+      value: action.id,
+      disabled: !view.canPerformActions || !preview,
+    },
+  )}
+            <div class="scene-action-preview">
+              <p>${escapeHtml(action.description ?? "この行動の説明は未設定です。")}</p>
+              <p>スタミナ消費 ${escapeHtml(preview?.staminaCost ?? "—")} ・ ${escapeHtml(parameterChangeText(preview))}</p>
+            </div>
+          </article>
+        `;
+  }).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function actionSelection(view) {
   return `
     <section class="panel selection-screen">
@@ -131,14 +182,7 @@ function actionSelection(view) {
       <div class="action-grid">
         ${view.actions.map((action) => {
     const preview = action.preview;
-    const changes = preview
-      ? Object.entries(preview.parameterChanges)
-        .filter(([, amount]) => amount !== 0)
-        .map(([parameter, amount]) =>
-          `${parameter === "affection" ? "好感度" : parameter === "stamina" ? "スタミナ" : "登録者数"} ${amount > 0 ? "+" : ""}${amount}`,
-        )
-        .join(" / ") || "状態変化なし"
-      : "現在は実行できません";
+    const changes = parameterChangeText(preview);
     return `
           <article class="action-card">
             <h2>${escapeHtml(action.label)}</h2>
@@ -172,6 +216,19 @@ function game(view) {
           <span>STAGE ${escapeHtml(view.stageNumber)} / 52</span>
           <h1>${escapeHtml(view.stageTitle)}</h1>
         </div>
+        <section class="scene-parameters" aria-label="現在のパラメータ">
+          <div class="scene-parameter">
+            <div><span>スタミナ</span><strong>${escapeHtml(view.displayStamina)} / ${escapeHtml(view.maxStamina)}</strong></div>
+            <meter min="0" max="${escapeHtml(view.maxStamina)}" value="${escapeHtml(view.displayStamina)}" aria-label="スタミナ"></meter>
+          </div>
+          <div class="scene-parameter">
+            <div><span>好感度</span><strong>${escapeHtml(view.affection)}</strong></div>
+            <meter min="${escapeHtml(view.affectionMin)}" max="${escapeHtml(view.affectionMax)}" value="${escapeHtml(view.affection)}" aria-label="好感度"></meter>
+          </div>
+          <div class="scene-parameter scene-parameter--count">
+            <span>登録者数</span><strong>${escapeHtml(view.subscribers)}</strong>
+          </div>
+        </section>
         <nav class="scene-controls" aria-label="ゲーム補助メニュー">
           ${button("ログ", "backlog", { kind: "quiet" })}
           ${view.event ? button(view.autoPlayEnabled ? "オート停止" : "オート", "toggle-auto-play", { kind: "quiet" }) : ""}

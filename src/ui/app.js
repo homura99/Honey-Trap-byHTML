@@ -27,6 +27,7 @@ export class GameApp {
     this.currentEvent = null;
     this.dialogueIndex = 0;
     this.dialogueFinished = false;
+    this.actionsPanelOpen = false;
     this.displayModeOverride = null;
     this.backlog = [];
     this.readDialogueKeys = new Set();
@@ -71,14 +72,19 @@ export class GameApp {
     const difficulty = state
       ? this.gameData["data/settings.yaml"].difficulty[state.difficultyId]
       : null;
-    const staminaDefinition = this.gameData["data/settings.yaml"].parameters.stamina;
+    const parameters = this.gameData["data/settings.yaml"].parameters;
+    const staminaDefinition = parameters.stamina;
+    const affectionDefinition = parameters.affection;
     const canPerformActions = Boolean(this.engine && !this.currentEvent &&
       !state?.stageTransitionPending && !state?.endingReached &&
       !state?.campaignComplete && !this.busy);
     const actions = state
       ? this.gameData["data/actions.yaml"].actions.map((action) => ({
         ...action,
-        preview: canPerformActions && this.screen === "actions"
+        preview: canPerformActions && (
+          this.screen === "actions" ||
+          (this.screen === "game" && this.actionsPanelOpen)
+        )
           ? this.engine.previewAction(action.id)
           : null,
       }))
@@ -108,6 +114,8 @@ export class GameApp {
       time: this.engine?.getTime() ?? { period: "", time: "", date: "" },
       displayStamina: state ? getDisplayStamina(this.gameData, state) : 0,
       maxStamina: staminaDefinition.max,
+      affectionMin: affectionDefinition.min,
+      affectionMax: affectionDefinition.max,
       affection: state?.affection ?? 0,
       subscribers: state?.subscribers ?? 0,
       difficultyLabel: difficulty?.label ?? "",
@@ -116,6 +124,7 @@ export class GameApp {
       pendingEventCount: state?.pendingEvents.length ?? 0,
       stageTransitionPending: Boolean(state?.stageTransitionPending),
       canPerformActions,
+      actionsPanelOpen: this.actionsPanelOpen,
       actions,
       backlog: this.backlog,
       autoPlayEnabled: this.autoPlayEnabled,
@@ -214,12 +223,14 @@ export class GameApp {
     this.currentEvent = null;
     this.dialogueIndex = 0;
     this.dialogueFinished = false;
+    this.actionsPanelOpen = false;
     this.displayModeOverride = null;
     this.backlog = [];
     this.readDialogueKeys.clear();
     this.screen = "game";
     this.clearMessage();
     this.render();
+    this.presentNextEvent();
   }
 
   async loadSlot(slotId, confirmReplace = true) {
@@ -248,6 +259,7 @@ export class GameApp {
       this.currentEvent = null;
       this.dialogueIndex = 0;
       this.dialogueFinished = false;
+      this.actionsPanelOpen = false;
       this.displayModeOverride = null;
       this.backlog = [];
       this.readDialogueKeys.clear();
@@ -283,7 +295,15 @@ export class GameApp {
     try {
       switch (action) {
         case "home":
+          if (this.engine && this.screen !== "home" &&
+            !this.engine.state.endingReached &&
+            !this.root.ownerDocument.defaultView.confirm(
+              "まだ保存されていない進行は失われる可能性があります。タイトルへ戻りますか？",
+            )) {
+            return;
+          }
           this.stopAutoPlay();
+          this.actionsPanelOpen = false;
           this.screen = "home";
           this.clearMessage();
           this.render();
@@ -307,42 +327,65 @@ export class GameApp {
           break;
         case "menu":
           this.stopAutoPlay();
+          this.actionsPanelOpen = false;
           this.screen = "menu";
           this.render();
           break;
         case "actions":
           this.stopAutoPlay();
-          this.screen = "actions";
+          this.actionsPanelOpen = true;
+          this.screen = "game";
+          this.render();
+          break;
+        case "toggle-actions":
+          if (!this.engine || this.currentEvent ||
+            this.engine.state.stageTransitionPending ||
+            this.engine.state.endingReached ||
+            this.engine.state.campaignComplete) {
+            return;
+          }
+          this.actionsPanelOpen = !this.actionsPanelOpen;
+          this.screen = "game";
+          this.render();
+          break;
+        case "close-actions":
+          this.actionsPanelOpen = false;
           this.render();
           break;
         case "status":
           this.stopAutoPlay();
+          this.actionsPanelOpen = false;
           this.screen = "status";
           this.render();
           break;
         case "backlog":
           this.stopAutoPlay();
+          this.actionsPanelOpen = false;
           this.screen = "backlog";
           this.render();
           break;
         case "settings":
           this.stopAutoPlay();
+          this.actionsPanelOpen = false;
           this.screen = "settings";
           this.render();
           break;
         case "endings":
           this.stopAutoPlay();
+          this.actionsPanelOpen = false;
           this.screen = "endings";
           await this.refreshEndings();
           break;
         case "save-screen":
           this.stopAutoPlay();
+          this.actionsPanelOpen = false;
           this.saveMode = "save";
           this.screen = "save";
           await this.refreshSlots();
           break;
         case "load-screen":
           this.stopAutoPlay();
+          this.actionsPanelOpen = false;
           this.saveMode = "load";
           this.screen = "load";
           await this.refreshSlots();
@@ -481,6 +524,7 @@ export class GameApp {
         this.screen = "game";
       } else if (this.screen === "game" && this.engine) {
         this.stopAutoPlay();
+        this.actionsPanelOpen = false;
         this.screen = "menu";
       } else {
         return;
@@ -546,6 +590,7 @@ export class GameApp {
     if (!this.engine) {
       return;
     }
+    this.actionsPanelOpen = false;
     this.busy = true;
     this.render();
     try {
@@ -580,6 +625,7 @@ export class GameApp {
     try {
       const event = this.engine.selectNextEvent();
       if (event) {
+        this.actionsPanelOpen = false;
         this.currentEvent = event;
         this.dialogueIndex = 0;
         this.dialogueFinished = event.dialogue.length === 0;
