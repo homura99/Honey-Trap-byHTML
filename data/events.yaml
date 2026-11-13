@@ -20,6 +20,14 @@ events:
     dialogue:
       - speaker: "天依わな"
         text: "これはデータ形式確認用の仮イベントです。"
+        scene: studio-dusk
+        silhouettes:
+          - placeholder: true
+            left: 62
+            bottom: 8
+            width: 30
+            opacity: 76
+            brightness: 34
     choices:
       - id: continue
         text: "確認する"
@@ -65,6 +73,7 @@ events:
     dialogue:
       - speaker: "ナレーション"
         text: "分岐先IDの参照を検証するための仮イベントです。"
+        scene: studio-night
     choices: []
     relatedEndingIds:
       - abandonment

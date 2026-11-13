@@ -29,7 +29,11 @@ const baseView = {
   eventHistoryCount: 0,
   pendingEventCount: 0,
   stageTransitionPending: false,
+  canPerformActions: false,
   actions: [],
+  backlog: [],
+  autoPlayEnabled: false,
+  skipReadEnabled: false,
   event: null,
   eventLine: null,
   eventChoices: [],
@@ -123,8 +127,83 @@ test("supports unnamed narration and optional local background and silhouette as
   assert.match(html, /aria-label="イベント地の文"/);
   assert.doesNotMatch(html, /<span class="speaker">/);
   assert.match(html, /class="scene-background-image" src="\/images\/night\.png"/);
-  assert.match(html, /class="scene-silhouette" src="\/images\/person-shadow\.png"/);
+  assert.match(html, /class="scene-silhouette"/);
+  assert.match(html, /<img src="\/images\/person-shadow\.png"/);
   assert.doesNotMatch(html, /キャラクター画像/);
+});
+
+test("renders a background-first novel screen with controls and no persistent status or action panels", () => {
+  const html = renderApp({
+    ...baseView,
+    screen: "game",
+    engine: {},
+    event: {
+      id: "scene",
+      dialogue: [{ speaker: "わな", text: "物語の文章です。" }],
+      choices: [],
+      deferPolicy: { enabled: false },
+    },
+    eventLine: { speaker: "わな", text: "物語の文章です。" },
+    eventChoices: [],
+  });
+
+  assert.match(html, /class="scene" aria-label="サウンドノベル画面"/);
+  assert.match(html, /data-action="backlog"/);
+  assert.match(html, /data-action="menu"/);
+  assert.doesNotMatch(html, /仮イベント解放/);
+  assert.match(html, /物語の文章です。/);
+  assert.doesNotMatch(html, /scene-status|sidebar|action-panel|スタミナ 100/);
+});
+
+test("keeps the development-only sample event control in the auxiliary menu", () => {
+  const html = renderApp({ ...baseView, screen: "menu", engine: {} });
+
+  assert.match(html, /data-action="unlock-sample-event"/);
+});
+
+test("renders a dedicated action menu with engine previews and an on-demand status page", () => {
+  const actionHtml = renderApp({
+    ...baseView,
+    screen: "actions",
+    engine: {},
+    canPerformActions: true,
+    actions: [{
+      id: "conversation",
+      label: "会話",
+      description: "わなと話す。",
+      timeCostMinutes: 30,
+      preview: {
+        timeCostMinutes: 30,
+        staminaCost: 5,
+        parameterChanges: { affection: 2, stamina: -5, subscribers: 0 },
+      },
+    }],
+  });
+  const statusHtml = renderApp({ ...baseView, screen: "status", engine: {} });
+
+  assert.match(actionHtml, /わなと話す。/);
+  assert.match(actionHtml, /消費スタミナ/);
+  assert.match(actionHtml, /好感度 \+2/);
+  assert.match(actionHtml, /実行可能/);
+  assert.match(statusHtml, /現在時刻/);
+  assert.match(statusHtml, /登録者数/);
+});
+
+test("supports multiple CSS silhouette placeholders with bounded layout values", () => {
+  const presentation = resolvePresentation({
+    scene: "studio-dusk",
+    silhouettes: [
+      { placeholder: true, left: 20, bottom: 8, width: 30, opacity: 75, brightness: 35 },
+      { image: "/images/person.png", left: 60, width: 25 },
+    ],
+  });
+  const html = renderScenePresentation(presentation);
+
+  assert.equal(presentation.silhouettes.length, 2);
+  assert.match(html, /scene-background--studio-dusk/);
+  assert.match(html, /scene-silhouette--placeholder/);
+  assert.match(html, /--silhouette-left:20%/);
+  assert.match(html, /<img src="\/images\/person\.png"/);
 });
 
 test("uses bottom mode by default and renders a fullscreen event line with a mode toggle", () => {

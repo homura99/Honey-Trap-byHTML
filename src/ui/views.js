@@ -20,8 +20,8 @@ function button(label, action, options = {}) {
 function navigation(gameActive) {
   return `
     <nav class="top-nav" aria-label="メニュー">
-      ${button("ホーム", "home", { kind: "quiet" })}
-      ${gameActive ? button("セーブ", "save-screen", { kind: "quiet" }) : ""}
+      ${gameActive ? button("本編へ戻る", "game", { kind: "quiet" }) : ""}
+      ${button("タイトル", "home", { kind: "quiet" })}
       ${button("ロード", "load-screen", { kind: "quiet" })}
       ${button("設定", "settings", { kind: "quiet" })}
       ${button("エンディング", "endings", { kind: "quiet" })}
@@ -44,7 +44,7 @@ function home(view) {
         ${button("設定", "settings")}
         ${button("エンディング一覧", "endings")}
       </div>
-      <p class="muted small">サウンドノベル形式の仮画面です。背景素材未設定時は単色表示になります。</p>
+      <p class="muted small">背景と文章を中心に物語が進みます。背景・シルエットは開発用CSS表現です。</p>
     </section>
   `;
 }
@@ -64,28 +64,17 @@ function config() {
   `;
 }
 
-function statusDetails(view) {
-  return `
-    <details class="details-panel">
-      <summary>詳細ステータス</summary>
-      <dl class="detail-grid">
-        <dt>好感度</dt><dd>${escapeHtml(view.affection)}</dd>
-        <dt>登録者数</dt><dd>${escapeHtml(view.subscribers)}</dd>
-        <dt>難易度</dt><dd>${escapeHtml(view.difficultyLabel)}</dd>
-        <dt>ストーリーフラグ</dt><dd>${escapeHtml(view.storyFlagSummary)}</dd>
-        <dt>イベント履歴</dt><dd>${escapeHtml(view.eventHistoryCount)} 件</dd>
-        <dt>保留イベント</dt><dd>${escapeHtml(view.pendingEventCount)} 件</dd>
-      </dl>
-    </details>
-  `;
-}
-
 function dialogue(view) {
   if (!view.event) {
     return `
       <section class="dialogue-window narration-window" aria-label="地の文">
-        <p>行動を選ぶか、発生可能なイベントを確認してください。</p>
-        <span class="dialogue-hint">イベント会話中は Enter / Space でも進めます。</span>
+        <span class="speaker">地の文</span>
+        <p>${escapeHtml(view.message?.type === "status" ? view.message.text : "静かな時間が流れている。次の行動を選ぶか、イベントを確認しよう。")}</p>
+        <span class="dialogue-hint">行動を選ぶか、発生可能なイベントを確認してください。</span>
+        <div class="dialogue-controls">
+          ${button("行動を選ぶ", "actions", { kind: "primary", disabled: !view.canPerformActions })}
+          ${button("イベント確認", "check-event")}
+        </div>
       </section>
     `;
   }
@@ -101,21 +90,21 @@ function dialogue(view) {
   ).join("")}
       </div>`
     : view.dialogueFinished
-      ? button("会話を閉じる", "complete-event", { kind: "primary" })
-      : button("会話送り", "advance-dialogue", { kind: "primary" });
+    ? button("会話を閉じる", "complete-event", { kind: "primary" })
+    : button("次へ", "advance-dialogue", { kind: "primary" });
 
   return `
     <section class="dialogue-window dialogue-window--${escapeHtml(displayMode)}${isNarration ? " narration-window" : ""}" aria-label="${isNarration ? "イベント地の文" : "イベント会話"}">
-      ${isNarration ? "" : `<span class="speaker">${escapeHtml(line.speaker)}</span>`}
-      <p>${escapeHtml(line?.text ?? "（会話データがありません）")}</p>
-      <span class="dialogue-hint">${view.dialogueFinished ? "選択してください" : "Enter / Space またはボタンで会話送り"}</span>
-      ${button(
+    ${isNarration ? "" : `<span class="speaker">${escapeHtml(line.speaker)}</span>`}
+    <p>${escapeHtml(line?.text ?? "（会話データがありません）")}</p>
+    <span class="dialogue-hint">${view.dialogueFinished ? "選択してください" : "クリック・タップ・Enter / Space で次へ"}</span>
+    ${button(
     displayMode === "bottom" ? "全画面表示に切り替え" : "通常表示に切り替え",
     "toggle-display-mode",
     { kind: "quiet" },
   )}
-      ${eventControls}
-      ${view.event.deferPolicy.enabled
+    ${eventControls}
+    ${view.event.deferPolicy?.enabled
     ? button("後回し", "defer-event", { kind: "quiet" })
     : ""}
     </section>
@@ -133,32 +122,43 @@ function resultText(line) {
   `;
 }
 
-function actionList(view) {
-  if (view.event || view.stageTransitionPending) {
-    return "";
-  }
+function actionSelection(view) {
   return `
-    <section class="panel action-panel">
-      <div class="section-heading">
-        <h2>行動</h2>
-        <p class="muted">実行前に時間・スタミナコストを確認できます。</p>
-      </div>
+    <section class="panel selection-screen">
+      <p class="eyebrow">DAILY ACTIONS</p>
+      <h1>行動を選ぶ</h1>
+      <p class="muted">時間と状態変化はゲームエンジンの現在値から算出しています。</p>
       <div class="action-grid">
-        ${view.actions.map((action) => `
+        ${view.actions.map((action) => {
+    const preview = action.preview;
+    const changes = preview
+      ? Object.entries(preview.parameterChanges)
+        .filter(([, amount]) => amount !== 0)
+        .map(([parameter, amount]) =>
+          `${parameter === "affection" ? "好感度" : parameter === "stamina" ? "スタミナ" : "登録者数"} ${amount > 0 ? "+" : ""}${amount}`,
+        )
+        .join(" / ") || "状態変化なし"
+      : "現在は実行できません";
+    return `
           <article class="action-card">
-            <h3>${escapeHtml(action.label)}</h3>
-            <p>時間 ${escapeHtml(action.timeCostMinutes)} 分 / スタミナ ${escapeHtml(action.staminaCost)}</p>
-            ${button("実行", "perform-action", {
-    value: action.id,
-    disabled: !view.canSave,
-  })}
+            <h2>${escapeHtml(action.label)}</h2>
+            <p>${escapeHtml(action.description ?? "この行動の説明は未設定です。")}</p>
+            <dl class="action-facts">
+              <dt>所要時間</dt><dd>${escapeHtml(preview?.timeCostMinutes ?? action.timeCostMinutes)} 分</dd>
+              <dt>消費スタミナ</dt><dd>${escapeHtml(preview?.staminaCost ?? "—")}</dd>
+              <dt>実行後の変化</dt><dd>${escapeHtml(changes)}</dd>
+              <dt>実行可否</dt><dd>${preview ? "実行可能" : "実行不可"}</dd>
+            </dl>
+            ${button("この行動を実行", "perform-action", {
+      value: action.id,
+      kind: "primary",
+      disabled: !view.canPerformActions || !preview,
+    })}
           </article>
-        `).join("")}
+        `;
+  }).join("")}
       </div>
-      <div class="toolbar">
-        ${button("イベント確認", "check-event")}
-        ${button("仮イベント解放（動作確認用）", "unlock-sample-event", { kind: "quiet" })}
-      </div>
+      ${button("物語へ戻る", "game", { kind: "quiet" })}
     </section>
   `;
 }
@@ -166,46 +166,27 @@ function actionList(view) {
 function game(view) {
   return `
     <section class="game-screen">
-      <div class="game-layout">
-        <section class="scene panel" aria-label="ゲーム画面">
-          ${renderScenePresentation(view.presentation)}
-          <div class="scene-heading">
-            <span>${escapeHtml(view.stageNumber)} / 52</span>
-            <h1>${escapeHtml(view.stageTitle)}</h1>
-          </div>
-          <div class="scene-status">
-            <span>${escapeHtml(view.time.period)} ${escapeHtml(view.time.time)}</span>
-            <span>${escapeHtml(view.time.date)}</span>
-            <span>スタミナ ${escapeHtml(view.displayStamina)} / ${escapeHtml(view.maxStamina)}</span>
-          </div>
-          ${dialogue(view)}
-        </section>
-        <aside class="sidebar">
-          <section class="panel compact-panel">
-            <h2>ステータス</h2>
-            <label class="meter-label" for="stamina-meter">スタミナ</label>
-            <progress id="stamina-meter" max="${escapeHtml(view.maxStamina)}" value="${escapeHtml(view.displayStamina)}"></progress>
-            <p>${escapeHtml(view.displayStamina)} / ${escapeHtml(view.maxStamina)}</p>
-            ${statusDetails(view)}
+      <section class="scene" aria-label="サウンドノベル画面" data-scene-click>
+        ${renderScenePresentation(view.presentation)}
+        <div class="scene-heading">
+          <span>STAGE ${escapeHtml(view.stageNumber)} / 52</span>
+          <h1>${escapeHtml(view.stageTitle)}</h1>
+        </div>
+        <nav class="scene-controls" aria-label="ゲーム補助メニュー">
+          ${button("ログ", "backlog", { kind: "quiet" })}
+          ${view.event ? button(view.autoPlayEnabled ? "オート停止" : "オート", "toggle-auto-play", { kind: "quiet" }) : ""}
+          ${view.event ? button(view.skipReadEnabled ? "既読スキップ中" : "既読スキップ", "toggle-skip-read", { kind: "quiet" }) : ""}
+          ${button("メニュー", "menu", { kind: "quiet" })}
+        </nav>
+        ${dialogue(view)}
+        ${view.stageTransitionPending ? `
+          <section class="stage-confirm panel" role="dialog" aria-labelledby="stage-confirm-title">
+            <h2 id="stage-confirm-title">ステージ終了</h2>
+            <p>現在のステージを終了して次へ進みますか？</p>
+            ${button("次のステージへ", "confirm-stage", { kind: "primary" })}
           </section>
-          <section class="panel compact-panel">
-            <h2>ゲームメニュー</h2>
-            <div class="stack">
-              ${button("セーブ", "save-screen", { disabled: !view.canSave })}
-              ${button("ロード", "load-screen")}
-              ${button("メニュー", "menu")}
-            </div>
-          </section>
-        </aside>
-      </div>
-      ${actionList(view)}
-      ${view.stageTransitionPending ? `
-        <section class="stage-confirm panel" role="dialog" aria-labelledby="stage-confirm-title">
-          <h2 id="stage-confirm-title">ステージ終了</h2>
-          <p>現在のステージを終了して次へ進みますか？</p>
-          ${button("次のステージへ", "confirm-stage", { kind: "primary" })}
-        </section>
-      ` : ""}
+        ` : ""}
+      </section>
     </section>
   `;
 }
@@ -291,11 +272,51 @@ function settings(view) {
       <h2>操作方法</h2>
       <ul class="instruction-list">
         <li>ボタンはマウス・タッチで操作できます。</li>
-        <li>イベント会話中は Enter または Space で会話を送れます。</li>
-        <li>Esc でゲームメニューを開閉します。</li>
+        <li>本編画面のクリック・タップ、Enter、Space で文章を送れます。</li>
+        <li>オート再生と既読スキップは本編画面から切り替えられます。</li>
+        <li>Esc で本編と補助画面を切り替えます。</li>
       </ul>
-      <p class="muted">正式な設定項目・デザインは後工程で接続します。</p>
+      <p class="muted">オート再生・既読スキップは、イベント会話中に本編画面から切り替えられます。</p>
       ${button("戻る", view.engine ? "game" : "home", { kind: "quiet" })}
+    </section>
+  `;
+}
+
+function statusScreen(view) {
+  return `
+    <section class="panel selection-screen">
+      <p class="eyebrow">STATUS</p>
+      <h1>ステータス</h1>
+      <dl class="detail-grid status-grid">
+        <dt>現在時刻</dt><dd>${escapeHtml(view.time.date)} / ${escapeHtml(view.time.period)} ${escapeHtml(view.time.time)}</dd>
+        <dt>ステージ</dt><dd>${escapeHtml(view.stageNumber)} / 52 ・ ${escapeHtml(view.stageTitle)}</dd>
+        <dt>スタミナ</dt><dd>${escapeHtml(view.displayStamina)} / ${escapeHtml(view.maxStamina)}</dd>
+        <dt>好感度</dt><dd>${escapeHtml(view.affection)}</dd>
+        <dt>登録者数</dt><dd>${escapeHtml(view.subscribers)}</dd>
+        <dt>難易度</dt><dd>${escapeHtml(view.difficultyLabel)}</dd>
+        <dt>イベント履歴</dt><dd>${escapeHtml(view.eventHistoryCount)} 件</dd>
+        <dt>保留イベント</dt><dd>${escapeHtml(view.pendingEventCount)} 件</dd>
+        <dt>ストーリーフラグ</dt><dd>${escapeHtml(view.storyFlagSummary)}</dd>
+      </dl>
+      <div class="toolbar">${button("物語へ戻る", "game", { kind: "primary" })}</div>
+    </section>
+  `;
+}
+
+function backlogScreen(view) {
+  return `
+    <section class="panel selection-screen">
+      <p class="eyebrow">BACKLOG</p>
+      <h1>バックログ</h1>
+      ${view.backlog.length
+    ? `<ol class="backlog-list">${view.backlog.map((entry) => `
+            <li>
+              ${entry.speaker ? `<strong>${escapeHtml(entry.speaker)}</strong>` : ""}
+              <p>${escapeHtml(entry.text)}</p>
+            </li>
+          `).join("")}</ol>`
+    : `<p class="muted">まだ読んだ文章はありません。</p>`}
+      ${button("物語へ戻る", "game", { kind: "primary" })}
     </section>
   `;
 }
@@ -333,17 +354,22 @@ function result(view) {
   `;
 }
 
-function menu() {
+function menu(view) {
   return `
     <section class="panel narrow-panel">
       <p class="eyebrow">MENU</p>
       <h1>メニュー</h1>
       <div class="stack">
         ${button("ゲームへ戻る", "game", { kind: "primary" })}
-        ${button("セーブ", "save-screen")}
+        ${button("行動を選ぶ", "actions", { disabled: !view.canPerformActions })}
+        ${button("ステータス", "status")}
+        ${button("バックログ", "backlog")}
+        ${button("セーブ", "save-screen", { disabled: !view.canSave })}
         ${button("ロード", "load-screen")}
         ${button("設定", "settings")}
-        ${button("ホーム", "home", { kind: "quiet" })}
+        ${button("エンディング一覧", "endings")}
+        ${button("仮イベント解放（開発用）", "unlock-sample-event", { kind: "quiet" })}
+        ${button("タイトルへ戻る", "home", { kind: "quiet" })}
       </div>
       <p class="muted small">Esc でゲームへ戻ります。</p>
     </section>
@@ -373,6 +399,15 @@ export function renderApp(view) {
     case "game":
       content = game(view);
       break;
+    case "actions":
+      content = actionSelection(view);
+      break;
+    case "status":
+      content = statusScreen(view);
+      break;
+    case "backlog":
+      content = backlogScreen(view);
+      break;
     case "save":
     case "load":
       content = saves(view);
@@ -387,21 +422,22 @@ export function renderApp(view) {
       content = result(view);
       break;
     case "menu":
-      content = menu();
+      content = menu(view);
       break;
     default:
       content = home(view);
   }
 
+  const isGame = view.screen === "game";
   return `
-    <div class="app-shell">
-      <header class="topbar">
+    <div class="app-shell${isGame ? " app-shell--game" : ""}">
+      ${isGame ? "" : `<header class="topbar">
         <a class="brand" href="#" data-action="home">天依わな育成シミュレーション <span>仮UI</span></a>
         ${navigation(Boolean(view.engine))}
-      </header>
-      ${view.message ? `<p class="notice${view.message.type === "error" ? " notice--error" : ""}" role="${view.message.type === "error" ? "alert" : "status"}">${escapeHtml(view.message.text)}</p>` : ""}
+      </header>`}
+      ${view.message && (!isGame || view.message.type === "error") ? `<p class="notice${view.message.type === "error" ? " notice--error" : ""}" role="${view.message.type === "error" ? "alert" : "status"}">${escapeHtml(view.message.text)}</p>` : ""}
       <main class="page-content">${content}</main>
-      <footer class="footer">開発用サンプル / 正式デザイン・シナリオではありません</footer>
+      ${isGame ? "" : `<footer class="footer">開発用サンプル / 正式デザイン・シナリオではありません</footer>`}
     </div>
   `;
 }

@@ -86,6 +86,22 @@ test("applies action costs, shortage penalties, parameter bounds, and returns di
   assert.equal(cappedEngine.state.affection, 100);
 });
 
+test("previews action cost and state changes without mutating the game", async () => {
+  const data = await loadGameDataFixture();
+  const engine = new GameEngine(data, "spicy");
+  engine.state.stamina = 10;
+  const initialSnapshot = engine.createSaveSnapshot();
+
+  const preview = engine.previewAction("stream");
+
+  assert.equal(preview.timeCostMinutes, 120);
+  assert.equal(preview.staminaCost, 36);
+  assert.equal(preview.parameterChanges.subscribers, 5);
+  assert.deepEqual(engine.createSaveSnapshot(), initialSnapshot);
+  const result = await engine.performAction("stream");
+  assert.deepEqual(result.parameterChanges, preview.parameterChanges);
+});
+
 test("moves between stages only after confirmation and preserves time overrun", async () => {
   const data = await loadGameDataFixture();
   const engine = new GameEngine(data, "sweet");

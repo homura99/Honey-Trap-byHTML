@@ -69,7 +69,26 @@ test("validates optional dialogue display modes and rejects unsupported values",
 
   const invalidResult = loadGameData(invalidSources);
   assert.equal(invalidResult.data, null);
-  assert.ok(invalidResult.errors.some((error) => error.includes('displayMode must be "bottom" or "fullscreen"')));
+  assert.ok(invalidResult.errors.some((error) =>
+    error.includes("display mode, and local presentation assets"),
+  ));
+});
+
+test("validates scenario backgrounds and multiple silhouette presentation data", async () => {
+  const validSources = await loadSources();
+  const validResult = loadGameData(validSources);
+
+  assert.deepEqual(validResult.errors, []);
+  assert.equal(validResult.data["data/events.yaml"].events[0].dialogue[0].scene, "studio-dusk");
+  assert.equal(validResult.data["data/events.yaml"].events[0].dialogue[0].silhouettes[0].placeholder, true);
+
+  const invalidSources = await loadSources();
+  invalidSources["data/events.yaml"] = invalidSources["data/events.yaml"]
+    .replace("            opacity: 76", "            opacity: 120");
+  const invalidResult = loadGameData(invalidSources);
+
+  assert.equal(invalidResult.data, null);
+  assert.ok(invalidResult.errors.some((error) => error.includes(".opacity: expected a number from 0 to 100")));
 });
 
 test("treats missing required fields as fatal and non-blocking issues as warnings", async () => {

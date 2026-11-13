@@ -28,6 +28,11 @@ export class GameApp {
     this.dialogueIndex = 0;
     this.dialogueFinished = false;
     this.displayModeOverride = null;
+    this.backlog = [];
+    this.readDialogueKeys = new Set();
+    this.autoPlayEnabled = false;
+    this.skipReadEnabled = false;
+    this.autoPlayTimer = null;
     this.slots = [];
     this.endings = [];
     this.endingRate = { collected: 0, total: 0, rate: 0 };
@@ -67,10 +72,15 @@ export class GameApp {
       ? this.gameData["data/settings.yaml"].difficulty[state.difficultyId]
       : null;
     const staminaDefinition = this.gameData["data/settings.yaml"].parameters.stamina;
+    const canPerformActions = Boolean(this.engine && !this.currentEvent &&
+      !state?.stageTransitionPending && !state?.endingReached &&
+      !state?.campaignComplete && !this.busy);
     const actions = state
       ? this.gameData["data/actions.yaml"].actions.map((action) => ({
         ...action,
-        staminaCost: action.staminaCost * difficulty.staminaCostMultiplier,
+        preview: canPerformActions && this.screen === "actions"
+          ? this.engine.previewAction(action.id)
+          : null,
       }))
       : [];
     const eventLines = this.currentEvent?.dialogue ?? [];
@@ -105,7 +115,11 @@ export class GameApp {
       eventHistoryCount: state?.eventHistory.length ?? 0,
       pendingEventCount: state?.pendingEvents.length ?? 0,
       stageTransitionPending: Boolean(state?.stageTransitionPending),
+      canPerformActions,
       actions,
+      backlog: this.backlog,
+      autoPlayEnabled: this.autoPlayEnabled,
+      skipReadEnabled: this.skipReadEnabled,
       event: this.currentEvent,
       eventLine: eventLines[this.dialogueIndex],
       displayMode: resolveDisplayMode(
@@ -195,17 +209,21 @@ export class GameApp {
   }
 
   async openGame(difficultyId) {
+    this.stopAutoPlay();
     this.engine = this.makeEngine(difficultyId);
     this.currentEvent = null;
     this.dialogueIndex = 0;
     this.dialogueFinished = false;
     this.displayModeOverride = null;
+    this.backlog = [];
+    this.readDialogueKeys.clear();
     this.screen = "game";
     this.clearMessage();
     this.render();
   }
 
   async loadSlot(slotId, confirmReplace = true) {
+    this.stopAutoPlay();
     if (confirmReplace && this.engine && this.screen !== "home" && this.screen !== "result") {
       const accepted = this.root.ownerDocument.defaultView.confirm(
         "現在のゲームを保存データで置き換えますか？",
@@ -231,6 +249,8 @@ export class GameApp {
       this.dialogueIndex = 0;
       this.dialogueFinished = false;
       this.displayModeOverride = null;
+      this.backlog = [];
+      this.readDialogueKeys.clear();
       this.screen = "game";
       this.clearMessage();
       await this.refreshSlots();
@@ -246,9 +266,13 @@ export class GameApp {
   }
 
   async handleClick(event) {
-    const target = event.target instanceof Element
-      ? event.target.closest("[data-action]")
-      : null;
+    const element = event.target instanceof Element ? event.target : null;
+    if (element?.closest(".scene[data-scene-click]") &&
+      !element.closest(INTERACTIVE_SELECTOR)) {
+      this.advanceDialogue();
+      return;
+    }
+    const target = element?.closest("[data-action]") ?? null;
     if (!target || target.hasAttribute("disabled") || this.busy) {
       return;
     }
@@ -259,11 +283,13 @@ export class GameApp {
     try {
       switch (action) {
         case "home":
+          this.stopAutoPlay();
           this.screen = "home";
           this.clearMessage();
           this.render();
           break;
         case "new-game":
+          this.stopAutoPlay();
           this.screen = "config";
           this.clearMessage();
           this.render();
@@ -280,23 +306,43 @@ export class GameApp {
           this.render();
           break;
         case "menu":
+          this.stopAutoPlay();
           this.screen = "menu";
           this.render();
           break;
+        case "actions":
+          this.stopAutoPlay();
+          this.screen = "actions";
+          this.render();
+          break;
+        case "status":
+          this.stopAutoPlay();
+          this.screen = "status";
+          this.render();
+          break;
+        case "backlog":
+          this.stopAutoPlay();
+          this.screen = "backlog";
+          this.render();
+          break;
         case "settings":
+          this.stopAutoPlay();
           this.screen = "settings";
           this.render();
           break;
         case "endings":
+          this.stopAutoPlay();
           this.screen = "endings";
           await this.refreshEndings();
           break;
         case "save-screen":
+          this.stopAutoPlay();
           this.saveMode = "save";
           this.screen = "save";
           await this.refreshSlots();
           break;
         case "load-screen":
+          this.stopAutoPlay();
           this.saveMode = "load";
           this.screen = "load";
           await this.refreshSlots();
@@ -327,6 +373,13 @@ export class GameApp {
           break;
         case "advance-dialogue":
           this.advanceDialogue();
+          break;
+        case "toggle-auto-play":
+          this.toggleAutoPlay();
+          break;
+        case "toggle-skip-read":
+          this.skipReadEnabled = !this.skipReadEnabled;
+          this.render();
           break;
         case "toggle-display-mode":
           this.toggleDisplayMode();
@@ -421,9 +474,13 @@ export class GameApp {
 
   handleKeyDown(event) {
     if (event.key === "Escape") {
-      if (this.screen === "menu") {
+      if (this.engine &&
+        ["menu", "actions", "status", "backlog", "save", "load", "settings", "endings"]
+          .includes(this.screen)) {
+        this.stopAutoPlay();
         this.screen = "game";
       } else if (this.screen === "game" && this.engine) {
+        this.stopAutoPlay();
         this.screen = "menu";
       } else {
         return;
@@ -433,7 +490,8 @@ export class GameApp {
       return;
     }
 
-    if (!this.currentEvent || !["Enter", " "].includes(event.key)) {
+    if (this.screen !== "game" || !this.currentEvent ||
+      this.dialogueFinished || !["Enter", " "].includes(event.key)) {
       return;
     }
     const target = event.target;
@@ -493,6 +551,7 @@ export class GameApp {
     try {
       const result = await this.engine.performAction(actionId);
       this.busy = false;
+      this.screen = "game";
       if (result.autoSave?.success === false) {
         this.showMessage(`行動しましたが、オートセーブに失敗しました: ${result.autoSave.error}`, "error");
       } else {
@@ -548,9 +607,10 @@ export class GameApp {
   }
 
   advanceDialogue() {
-    if (!this.currentEvent) {
+    if (!this.currentEvent || this.dialogueFinished) {
       return;
     }
+    this.recordCurrentDialogue();
     if (this.dialogueIndex + 1 < this.currentEvent.dialogue.length) {
       this.dialogueIndex += 1;
       this.displayModeOverride = null;
@@ -558,6 +618,62 @@ export class GameApp {
       this.dialogueFinished = true;
     }
     this.render();
+    if (this.skipReadEnabled && !this.dialogueFinished &&
+      this.isCurrentDialogueRead()) {
+      this.root.ownerDocument.defaultView.setTimeout(() => this.advanceDialogue(), 0);
+    }
+  }
+
+  currentDialogueKey() {
+    return this.currentEvent
+      ? `${this.currentEvent.id}:${this.dialogueIndex}`
+      : null;
+  }
+
+  isCurrentDialogueRead() {
+    const key = this.currentDialogueKey();
+    return Boolean(key && this.readDialogueKeys.has(key));
+  }
+
+  recordCurrentDialogue() {
+    const key = this.currentDialogueKey();
+    const line = this.currentEvent?.dialogue[this.dialogueIndex];
+    if (!key || !line || this.readDialogueKeys.has(key)) {
+      return;
+    }
+    this.readDialogueKeys.add(key);
+    this.backlog.push({
+      key,
+      eventId: this.currentEvent.id,
+      speaker: line.speaker ?? "",
+      text: line.text,
+    });
+  }
+
+  toggleAutoPlay() {
+    if (this.autoPlayTimer !== null) {
+      this.stopAutoPlay();
+      this.render();
+      return;
+    }
+    this.autoPlayEnabled = true;
+    this.autoPlayTimer = this.root.ownerDocument.defaultView.setInterval(() => {
+      if (this.screen !== "game" || !this.currentEvent || this.dialogueFinished) {
+        this.stopAutoPlay();
+        this.render();
+        return;
+      }
+      this.advanceDialogue();
+    }, 2200);
+    this.render();
+  }
+
+  stopAutoPlay() {
+    if (this.autoPlayTimer !== null) {
+      this.root.ownerDocument.defaultView.clearInterval(this.autoPlayTimer);
+      this.autoPlayTimer = null;
+    }
+    this.autoPlayEnabled = false;
   }
 
   toggleDisplayMode() {
@@ -576,6 +692,7 @@ export class GameApp {
     if (!this.engine || !this.currentEvent || !this.dialogueFinished) {
       return;
     }
+    this.stopAutoPlay();
     const result = this.engine.chooseEventOption(choiceId);
     this.currentEvent = null;
     this.dialogueFinished = false;
@@ -600,6 +717,7 @@ export class GameApp {
     if (!this.engine || !this.currentEvent) {
       return;
     }
+    this.stopAutoPlay();
     this.engine.completeEvent();
     this.currentEvent = null;
     this.dialogueFinished = false;
@@ -615,6 +733,7 @@ export class GameApp {
     if (!this.engine || !this.currentEvent) {
       return;
     }
+    this.stopAutoPlay();
     this.engine.deferEvent();
     this.currentEvent = null;
     this.dialogueFinished = false;

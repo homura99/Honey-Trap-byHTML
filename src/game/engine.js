@@ -1,4 +1,4 @@
-import { executeAction } from "./actions.js";
+import { executeAction, previewAction } from "./actions.js";
 import {
   completeEventWithoutChoice,
   deferActiveEvent,
@@ -67,6 +67,10 @@ export class GameEngine {
     const operationResult = { ...result, ending: immediateEnding };
     const autoSave = await this.#autoSave("action");
     return { ...operationResult, autoSave };
+  }
+
+  previewAction(actionId) {
+    return previewAction(this.gameData, this.state, actionId);
   }
 
   getAvailableEvents() {

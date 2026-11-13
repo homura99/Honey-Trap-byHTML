@@ -56,3 +56,19 @@ export function executeAction(gameData, state, actionId) {
     stageTransitionPending: state.stageTransitionPending,
   };
 }
+
+export function previewAction(gameData, state, actionId) {
+  const previewState = {
+    ...state,
+    storyFlags: structuredClone(state.storyFlags),
+  };
+  const result = executeAction(gameData, previewState, actionId);
+  return {
+    ...result,
+    parameters: {
+      affection: previewState.affection,
+      stamina: previewState.stamina,
+      subscribers: previewState.subscribers,
+    },
+  };
+}

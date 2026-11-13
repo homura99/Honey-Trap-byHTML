@@ -145,10 +145,41 @@ function validateDialogue(dialogue, path, errors) {
     if (!isRecord(line) ||
       (line.speaker !== undefined && line.speaker !== null && typeof line.speaker !== "string") ||
       (line.displayMode !== undefined && !["bottom", "fullscreen"].includes(line.displayMode)) ||
+      (line.scene !== undefined &&
+        (typeof line.scene !== "string" || !/^[a-z][a-z0-9-]*$/.test(line.scene))) ||
+      ["backgroundImage", "silhouetteImage"].some((key) =>
+        line[key] !== undefined && (typeof line[key] !== "string" || !line[key].trim()),
+      ) ||
       typeof line.text !== "string" || !line.text.trim()) {
       errors.push(
-        `${path}[${index}]: text is required; speaker must be a string when provided and displayMode must be "bottom" or "fullscreen".`,
+        `${path}[${index}]: text is required; speaker, scene, display mode, and local presentation assets must be valid when provided.`,
       );
+      return;
+    }
+
+    if (line.silhouettes !== undefined && !Array.isArray(line.silhouettes)) {
+      errors.push(`${path}[${index}].silhouettes: expected an array.`);
+      return;
+    }
+    for (const [silhouetteIndex, silhouette] of (line.silhouettes ?? []).entries()) {
+      const silhouettePath = `${path}[${index}].silhouettes[${silhouetteIndex}]`;
+      if (!isRecord(silhouette) ||
+        (silhouette.image !== undefined &&
+          (typeof silhouette.image !== "string" || !silhouette.image.trim())) ||
+        (silhouette.placeholder !== undefined && typeof silhouette.placeholder !== "boolean")) {
+        errors.push(`${silhouettePath}: expected an image path or CSS placeholder definition.`);
+        continue;
+      }
+      if (!silhouette.image && silhouette.placeholder !== true) {
+        errors.push(`${silhouettePath}: image or placeholder: true is required.`);
+      }
+      for (const key of ["left", "bottom", "width", "opacity", "brightness"]) {
+        if (silhouette[key] !== undefined &&
+          (typeof silhouette[key] !== "number" || !Number.isFinite(silhouette[key]) ||
+            silhouette[key] < 0 || silhouette[key] > 100)) {
+          errors.push(`${silhouettePath}.${key}: expected a number from 0 to 100.`);
+        }
+      }
     }
   });
 }
@@ -358,6 +389,10 @@ function validateActions(actionData, errors) {
     if (typeof action.category !== "string" || !action.category.trim() ||
       typeof action.label !== "string" || !action.label.trim()) {
       errors.push(`${path}: category and label must be non-empty strings.`);
+    }
+    if (action.description !== undefined &&
+      (typeof action.description !== "string" || !action.description.trim())) {
+      errors.push(`${path}: description must be a non-empty string when provided.`);
     }
     if (!Number.isInteger(action.timeCostMinutes) || action.timeCostMinutes < 0 ||
       typeof action.staminaCost !== "number" || action.staminaCost < 0) {

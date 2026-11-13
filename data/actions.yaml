@@ -4,6 +4,7 @@ actions:
   - id: conversation
     category: conversation
     label: "会話"
+    description: "わなと話をして、関係を深める。"
     timeCostMinutes: 30
     staminaCost: 5
     effects:
@@ -14,6 +15,7 @@ actions:
   - id: travel
     category: movement
     label: "移動"
+    description: "活動場所を移動して次の行動に備える。"
     timeCostMinutes: 60
     staminaCost: 8
     effects:
@@ -24,6 +26,7 @@ actions:
   - id: meal
     category: meal
     label: "食事"
+    description: "食事をとってスタミナを回復する。"
     timeCostMinutes: 30
     staminaCost: 0
     effects:
@@ -34,6 +37,7 @@ actions:
   - id: rest
     category: rest
     label: "休憩"
+    description: "ひと息ついてスタミナを回復する。"
     timeCostMinutes: 60
     staminaCost: 0
     effects:
@@ -44,6 +48,7 @@ actions:
   - id: practice
     category: study-practice
     label: "勉強・練習"
+    description: "勉強や練習をして活動の力をつける。"
     timeCostMinutes: 90
     staminaCost: 15
     effects:
@@ -54,6 +59,7 @@ actions:
   - id: stream-preparation
     category: stream-preparation
     label: "配信準備"
+    description: "配信内容を考え、必要な準備をする。"
     timeCostMinutes: 60
     staminaCost: 10
     effects:
@@ -64,6 +70,7 @@ actions:
   - id: stream
     category: stream
     label: "配信"
+    description: "配信を行い、活動と登録者数を伸ばす。"
     timeCostMinutes: 120
     staminaCost: 30
     effects:
@@ -74,6 +81,7 @@ actions:
   - id: special
     category: special-event
     label: "特殊イベント"
+    description: "特別な活動を実行する。"
     timeCostMinutes: 0
     staminaCost: 0
     effects:
