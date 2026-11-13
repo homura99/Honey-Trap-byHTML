@@ -910,6 +910,7 @@ summary:focus-visible {
 }
 
 .scene-action-choice {
+  position: relative;
   min-width: 0;
 }
 
@@ -921,14 +922,27 @@ summary:focus-visible {
 }
 
 .scene-action-preview {
-  /* ホバー・フォーカス時に行動ボタンの上へ出る説明欄 */
-  display: none;
-  margin-bottom: 0.35rem;
+  /* ホバー・フォーカス時に行動ボタンの上へ重なって出る説明欄 */
+  position: absolute;
+  z-index: 4;
+  right: 0;
+  bottom: calc(100% + 0.35rem);
+  left: 0;
   padding: 0.5rem 0.65rem;
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   background: var(--window-bg);
+  box-shadow: 0 0.5rem 1.5rem var(--shadow-strong);
   font-size: 0.78rem;
+  pointer-events: none;
+  /* 通常時は透明にして少し下げておく */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.35rem);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease,
+    visibility 0s linear 220ms; /* 消えるアニメが終わってから隠す */
 }
 
 .scene-action-preview p {
@@ -944,7 +958,10 @@ summary:focus-visible {
 .scene-action-choice:hover .scene-action-preview,
 .scene-action-choice:focus-within .scene-action-preview {
   /* マウス操作・キーボード操作のどちらでも説明を表示 */
-  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition-delay: 0s;
 }
 
 /* 全文表示モードの本文ウィンドウ */
